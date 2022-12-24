@@ -1,4 +1,4 @@
-package sk.test.dsl.core;
+package sk.test.dsl.kaufland;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -8,6 +8,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import sk.test.dsl.core.Category;
+import sk.test.dsl.core.HTMLProductParser;
+import sk.test.dsl.core.Product;
+
 public class KauflandParser implements HTMLProductParser {
 
 	private static final DecimalFormat PERCENTAGE_DISCOUNT_FORMAT = new DecimalFormat("0.#");
@@ -16,7 +20,7 @@ public class KauflandParser implements HTMLProductParser {
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		Elements tiles = htmlPage.select(".g-col.o-overview-list__list-item");
 		List<Product> products = new ArrayList<>();
-
+		System.out.println(productsCategory);
 		for (Element tile : tiles) {
 
 			// TODO: poriesit aj ceny ktore nemaju predchadzajucu cenu lebo maju znacku "iba"/"len"
@@ -52,9 +56,9 @@ public class KauflandParser implements HTMLProductParser {
 			product.setCategory(productsCategory);
 			product.setQuantityWithUnit(quantity);
 			setClubCardBondIfPresent(price, product);
-			product.setPrice(parsePrice(price));
+			product.setPrice(parsePrice(price)); // ERROR: ovocie zelenina empty string!!!
 			product.setPreviousPrice(parsePrice(prevPrice));
-			product.setPercentageDiscount(parseDiscountPercentage(discountPercentage));
+			product.setPercentageDiscount(parseDiscountPercentage(discountPercentage)); // ERROR: kava, caj, sladke, slane "1/2CENY!" 
 
 			products.add(product);
 		}
@@ -76,6 +80,7 @@ public class KauflandParser implements HTMLProductParser {
 	}
 
 	private String parseDiscountPercentage(String discountPercentage) {
+		// TODO: there can be also "1/2CENA!" -> fix it
 		String discountPercentageCopy = discountPercentage
 			.replace(" ", "")  // -29%-30% 
 			.replace('%', ' ') // -29 -30
@@ -85,13 +90,21 @@ public class KauflandParser implements HTMLProductParser {
 
 	// this will not tell me if it is club card bounded
 	private double parsePrice(String textPrice) {
-		String price = textPrice.replace(',', '.');
-		int delimiterIndex;
-		if ((delimiterIndex = price.indexOf(' ')) >= 0) {
-			double price1 = Double.parseDouble(price.substring(0, delimiterIndex));
-			double price2 = Double.parseDouble(price.substring(delimiterIndex));
-			return Math.min(price1, price2);
+		if (textPrice.isEmpty()) {
+			return 0.0;
 		}
-		return Double.parseDouble(price);
+		String price = textPrice.replace(',', '.');
+//		try {
+			int delimiterIndex;
+			if ((delimiterIndex = price.indexOf(' ')) >= 0) {
+				double price1 = Double.parseDouble(price.substring(0, delimiterIndex));
+				double price2 = Double.parseDouble(price.substring(delimiterIndex));
+				return Math.min(price1, price2);
+			}
+			return Double.parseDouble(price);
+//		} catch (NumberFormatException nfex) {
+//			System.out.println("nfex -> " + price);
+//			return 0.0;
+//		}
 	}
 }
