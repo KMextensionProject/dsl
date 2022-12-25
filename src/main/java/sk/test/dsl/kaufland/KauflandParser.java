@@ -23,28 +23,27 @@ public class KauflandParser implements HTMLProductParser {
 
 		for (Element tile : tiles) {
 			Elements descriptionPart = tile.select(".m-offer-tile__text");
-			String h5 = descriptionPart.select(".m-offer-tile__subtitle").text();
 
-			// the whole tile might have been empty / used as advertisement
-			if (h5.isBlank()) {
+			// the whole tile may be empty / used as advertisement
+			if (descriptionPart.isEmpty()) {
 				continue;
 			}
 
+			String h5 = descriptionPart.select(".m-offer-tile__subtitle").text();
 			String h4 = descriptionPart.select(".m-offer-tile__title").text();
 			String quantity = descriptionPart.select(".m-offer-tile__quantity").text().replace(" ", "");
 
 			Elements discountPartParent = tile
 				.select(".m-offer-tile__split")
 				.select(".m-offer-tile__price-tiles")
-				// this section comes only with discount products and not with those marked "iba"
+				// this section is parent to discount products only and not to those marked "iba"
 				.select(".a-pricetag.a-pricetag--discount");
 
-			// there may be a non-discount product
+			// there may be a non-discount product -> "iba"
 			if (discountPartParent.isEmpty()) {
 				continue;
 			}
 
-			// toto moze mat dvoje percenta ak ide o club card
 			String discountPercentage = discountPartParent.select(".a-pricetag__discount").text();
 			Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container ");
 
@@ -83,7 +82,11 @@ public class KauflandParser implements HTMLProductParser {
 	}
 
 	private String parseDiscountPercentage(String discountPercentage) {
-		// TODO: there can be also "1/2CENA!" -> fix it
+		// sometimes they use to put "1/2 CENA!" instead of number
+		if (discountPercentage.startsWith("1/2")) {
+			return "-50%";
+		}
+
 		String discountPercentageCopy = discountPercentage
 			.replace(" ", "")  // -29%-30% 
 			.replace('%', ' ') // -29 -30
