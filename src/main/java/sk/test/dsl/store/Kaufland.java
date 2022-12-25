@@ -10,6 +10,9 @@ import sk.test.dsl.core.Store;
 import sk.test.dsl.store.utils.KauflandParser;
 import sk.test.dsl.store.utils.KauflandURLMapper;
 
+// list of products for this store should be updated / cached
+// who will update it, or where will it be actually stored?
+// 
 public class Kaufland extends Store {
 
 	// add spring IoC to manage these
@@ -18,6 +21,7 @@ public class Kaufland extends Store {
 
 	@Override
 	public List<Product> getDiscountProducts() {
+		// returne cached values?
 		return null;
 	}
 
@@ -26,4 +30,7 @@ public class Kaufland extends Store {
 		return List.of(WEDNESDAY);
 	}
 
+	// implement Update method which will be called by the cron
+	// and so the Store parent class should have pass the contract to this class for it?
+	
 }
