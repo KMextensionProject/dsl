@@ -1,5 +1,7 @@
 package sk.test.dsl.store;
 
+import static java.time.DayOfWeek.WEDNESDAY;
+
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -15,13 +17,13 @@ public class Kaufland extends Store {
 	private KauflandParser parser;
 
 	@Override
-	public DayOfWeek getDiscountDay() {
-		return DayOfWeek.WEDNESDAY;
+	public List<Product> getDiscountProducts() {
+		return null;
 	}
 
 	@Override
-	public List<Product> getDiscountProducts() {
-		return null;
+	public List<DayOfWeek> getDiscountUpdatingDays() {
+		return List.of(WEDNESDAY);
 	}
 
 }
