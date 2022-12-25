@@ -20,14 +20,11 @@ public class KauflandParser implements HTMLProductParser {
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		Elements tiles = htmlPage.select(".g-col.o-overview-list__list-item");
 		List<Product> products = new ArrayList<>();
-		System.out.println(productsCategory);
+
 		for (Element tile : tiles) {
-
-			// TODO: poriesit aj ceny ktore nemaju predchadzajucu cenu lebo maju znacku "iba"/"len"
-
 			Elements descriptionPart = tile.select(".m-offer-tile__text");
 			String h5 = descriptionPart.select(".m-offer-tile__subtitle").text();
-			
+
 			// the whole tile might have been empty / used as advertisement
 			if (h5.isBlank()) {
 				continue;
@@ -39,7 +36,13 @@ public class KauflandParser implements HTMLProductParser {
 			Elements discountPartParent = tile
 				.select(".m-offer-tile__split")
 				.select(".m-offer-tile__price-tiles")
+				// this section comes only with discount products and not with those marked "iba"
 				.select(".a-pricetag.a-pricetag--discount");
+
+			// there may be a non-discount product
+			if (discountPartParent.isEmpty()) {
+				continue;
+			}
 
 			// toto moze mat dvoje percenta ak ide o club card
 			String discountPercentage = discountPartParent.select(".a-pricetag__discount").text();
@@ -56,9 +59,9 @@ public class KauflandParser implements HTMLProductParser {
 			product.setCategory(productsCategory);
 			product.setQuantityWithUnit(quantity);
 			setClubCardBondIfPresent(price, product);
-			product.setPrice(parsePrice(price)); // ERROR: ovocie zelenina empty string!!!
+			product.setPrice(parsePrice(price));
 			product.setPreviousPrice(parsePrice(prevPrice));
-			product.setPercentageDiscount(parseDiscountPercentage(discountPercentage)); // ERROR: kava, caj, sladke, slane "1/2CENY!" 
+			product.setPercentageDiscount(parseDiscountPercentage(discountPercentage)); // ERROR: kava, caj, sladke, slane "1/2CENY!"
 
 			products.add(product);
 		}
@@ -88,11 +91,7 @@ public class KauflandParser implements HTMLProductParser {
 		return PERCENTAGE_DISCOUNT_FORMAT.format(parsePrice(discountPercentageCopy)) + "%"; // -30%
 	}
 
-	// this will not tell me if it is club card bounded
 	private double parsePrice(String textPrice) {
-		if (textPrice.isEmpty()) {
-			return 0.0;
-		}
 		String price = textPrice.replace(',', '.');
 //		try {
 			int delimiterIndex;
