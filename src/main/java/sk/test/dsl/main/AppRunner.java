@@ -12,8 +12,8 @@ import org.jsoup.nodes.Document;
 
 import sk.test.dsl.core.Category;
 import sk.test.dsl.core.Product;
-import sk.test.dsl.kaufland.KauflandEndpointMapper;
-import sk.test.dsl.kaufland.KauflandParser;
+import sk.test.dsl.store.utils.KauflandParser;
+import sk.test.dsl.store.utils.KauflandURLMapper;
 
 public class AppRunner {
 
@@ -27,7 +27,7 @@ public class AppRunner {
 //		System.out.println("\n--------- PRODUCTS WITH NO BOUND TO CLUB CARD ---------\n");
 //		productsPartitionedByClubCardBond.get(false).forEach(System.out::println);
 
-		EnumMap<Category, String> kauflandEndpoints = KauflandEndpointMapper.getCategoryEndpointMap();	
+		EnumMap<Category, String> kauflandEndpoints = new KauflandURLMapper().getCategoryURLMap();	
 		KauflandParser kauflandParser = new KauflandParser();
 		List<Product> products = new ArrayList<>(500);
 

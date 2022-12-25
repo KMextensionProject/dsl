@@ -1,4 +1,4 @@
-package sk.test.dsl.kaufland;
+package sk.test.dsl.store.utils;
 
 import static sk.test.dsl.core.Category.CERSTVE_VYROBKY;
 import static sk.test.dsl.core.Category.KAVA_CAJ_SLADKE_SLANE;
@@ -13,8 +13,9 @@ import static sk.test.dsl.core.Category.TRVANLIVE_POTRAVINY;
 import java.util.EnumMap;
 
 import sk.test.dsl.core.Category;
+import sk.test.dsl.core.CategoryURLMapper;
 
-public class KauflandEndpointMapper {
+public class KauflandURLMapper implements CategoryURLMapper {
 
 	private static final String BASE_URL = "https://www.kaufland.sk/aktualna-ponuka/aktualny-tyzden/akciove-vyrobky.category=";
 	private static final EnumMap<Category, String> CATEGORY_ENDPOINT_MAP;
@@ -36,7 +37,8 @@ public class KauflandEndpointMapper {
 		return BASE_URL + uri;
 	}
 
-	public static EnumMap<Category, String> getCategoryEndpointMap() {
-		return CATEGORY_ENDPOINT_MAP;
+	@Override
+	public EnumMap<Category, String> getCategoryURLMap() {
+		return new EnumMap<>(CATEGORY_ENDPOINT_MAP);
 	}
 }

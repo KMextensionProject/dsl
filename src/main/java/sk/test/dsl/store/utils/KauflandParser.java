@@ -1,4 +1,4 @@
-package sk.test.dsl.kaufland;
+package sk.test.dsl.store.utils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
