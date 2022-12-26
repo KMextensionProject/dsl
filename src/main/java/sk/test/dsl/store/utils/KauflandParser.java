@@ -96,17 +96,12 @@ public class KauflandParser implements HTMLProductParser {
 
 	private double parsePrice(String textPrice) {
 		String price = textPrice.replace(',', '.');
-//		try {
-			int delimiterIndex;
-			if ((delimiterIndex = price.indexOf(' ')) >= 0) {
-				double price1 = Double.parseDouble(price.substring(0, delimiterIndex));
-				double price2 = Double.parseDouble(price.substring(delimiterIndex));
-				return Math.min(price1, price2);
-			}
-			return Double.parseDouble(price);
-//		} catch (NumberFormatException nfex) {
-//			System.out.println("nfex -> " + price);
-//			return 0.0;
-//		}
+		int delimiterIndex;
+		if ((delimiterIndex = price.indexOf(' ')) >= 0) {
+			double price1 = Double.parseDouble(price.substring(0, delimiterIndex));
+			double price2 = Double.parseDouble(price.substring(delimiterIndex));
+			return Math.min(price1, price2);
+		}
+		return Double.parseDouble(price);
 	}
 }
