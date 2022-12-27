@@ -3,49 +3,58 @@ package sk.test.dsl.main;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import sk.test.dsl.core.Category;
 import sk.test.dsl.core.Product;
-import sk.test.dsl.store.utils.KauflandParser;
-import sk.test.dsl.store.utils.KauflandURLMapper;
+import sk.test.dsl.store.utils.TescoParser;
+import sk.test.dsl.store.utils.TescoURLMapper;
 
 public class AppRunner {
 
 	public static void main(String[] args) throws IOException {
-//		Document doc = Jsoup.connect("https://www.kaufland.sk/aktualna-ponuka/aktualny-tyzden/akciove-vyrobky.category=01_M%C3%A4so__hydina__%C3%BAdeniny.html").get();
-//		Map<Boolean, List<Product>> productsPartitionedByClubCardBond = new KauflandParser().parseHtmlProductsInfo(doc, Category.MASO_UDENINY).stream()
-//			.collect(Collectors.partitioningBy(Product::isClubCardBounded));
+		
+		// Kaufland
+//		EnumMap<Category, String> kauflandEndpoints = new KauflandURLMapper().getCategoryURLMap();	
+//		KauflandParser kauflandParser = new KauflandParser();
+//		List<Product> products = new ArrayList<>(250);
 //
-//		System.out.println("------------ PRODUCTS BOUNDED TO CLUB CARD ------------\n");
-//		productsPartitionedByClubCardBond.get(true).forEach(System.out::println);
-//		System.out.println("\n--------- PRODUCTS WITH NO BOUND TO CLUB CARD ---------\n");
-//		productsPartitionedByClubCardBond.get(false).forEach(System.out::println);
+//		Document htmlPage;
+//		for (Map.Entry<Category, String> entry : kauflandEndpoints.entrySet()) {
+//			htmlPage = Jsoup.connect(entry.getValue()).get();
+//			products.addAll(kauflandParser.parseHtmlProductsInfo(htmlPage, entry.getKey()));
+//		}
+//
+//		Map<Category, List<Product>> productsByCategory = products.stream()
+//				.collect(Collectors.groupingBy(Product::getCategory, Collectors.toList()));
+//
+//		for (Map.Entry<Category, List<Product>> entry : productsByCategory.entrySet()) {
+//			writer.append("----------" + entry.getKey() + "----------");
+//			writer.append(System.lineSeparator());
+//			entry.getValue().forEach(AppRunner::println);
+//		}
 
-		EnumMap<Category, String> kauflandEndpoints = new KauflandURLMapper().getCategoryURLMap();	
-		KauflandParser kauflandParser = new KauflandParser();
-		List<Product> products = new ArrayList<>(250);
+		// Tesco
+		TescoURLMapper tescoUrlMapper = new TescoURLMapper();
+		TescoParser tescoParser = new TescoParser();
 
-		Document htmlPage;
-		for (Map.Entry<Category, String> entry : kauflandEndpoints.entrySet()) {
-			htmlPage = Jsoup.connect(entry.getValue()).get();
-			products.addAll(kauflandParser.parseHtmlProductsInfo(htmlPage, entry.getKey()));
-		}
+		// ziskam si zakladnu URL 1. stranky pre danu kategoriu
+		String baseCategoryUrl = tescoUrlMapper.getCategoryURLMap().get(Category.TRVANLIVE_POTRAVINY);
 
-		Map<Category, List<Product>> productsByCategory = products.stream()
-				.collect(Collectors.groupingBy(Product::getCategory, Collectors.toList()));
+		// ziskam si z nej pocet stranok, na kolkatich sa rozpinaju produkty tejto kategorie
+		int pages = tescoParser.getNumberOfAvailablePages(Jsoup.connect(baseCategoryUrl).get());
 
-		for (Map.Entry<Category, List<Product>> entry : productsByCategory.entrySet()) {
-			writer.append("----------" + entry.getKey() + "----------");
-			entry.getValue().forEach(AppRunner::println);
-		}
+		// ziskam si podla poslednej strany vsetky produkty (od 1. strany) ako html dokument
+		Document htmlPage = Jsoup.connect(tescoUrlMapper.getPagedURLByCategory(Category.TRVANLIVE_POTRAVINY, pages)).get();
+
+		// extrahujem z html stranky vsetky data o relevantnych produktoch a spravim si z nich java Produkty v konkretnej kategorii
+		List<Product> products = tescoParser.parseHtmlProductsInfo(htmlPage, Category.TRVANLIVE_POTRAVINY);
+
+		// zobrazim si cely zoznam produktov
+		products.forEach(AppRunner::println);
 	}
 
 	private static BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
