@@ -5,17 +5,17 @@ public class Product {
 	private Category category;
 	private String name;
 	private String quantityWithUnit;
-	private double price; // this can be double - no precision loss
+	private double price;
 	private double previousPrice;
 	private String percentageDiscount;
-	private boolean clubCardBounded;
+	private boolean clubCardBonded;
+
+	private Product() {
+		
+	}
 
 	public Category getCategory() {
 		return category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
 	}
 
 	public String getName() {
@@ -30,46 +30,70 @@ public class Product {
 		return quantityWithUnit;
 	}
 
-	public void setQuantityWithUnit(String quantityWithUnit) {
-		this.quantityWithUnit = quantityWithUnit;
-	}
-
 	public double getPrice() {
 		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
 	}
 
 	public double getPreviousPrice() {
 		return previousPrice;
 	}
 
-	public void setPreviousPrice(double previousPrice) {
-		this.previousPrice = previousPrice;
-	}
-
 	public String getPercentageDiscount() {
 		return percentageDiscount;
 	}
 
-	public void setPercentageDiscount(String percentageDiscount) {
-		this.percentageDiscount = percentageDiscount;
-	}
-
-	public boolean isClubCardBounded() {
-		return clubCardBounded;
-	}
-
-	public void setClubCardBounded() {
-		this.clubCardBounded = true;
+	public boolean isClubCardBonded() {
+		return clubCardBonded;
 	}
 
 	@Override
 	public String toString() {
 		return "Product [category=" + category + ", name=" + name + ", quantityWithUnit=" + quantityWithUnit
 			+ ", price=" + price + ", previousPrice=" + previousPrice + ", percentageDiscount=" + percentageDiscount
-			+ ", clubCardBounded=" + clubCardBounded + "]";
+			+ ", clubCardBounded=" + clubCardBonded + "]";
+	}
+	
+	public static class ProductBuilder {
+
+		private final Product product = new Product();
+
+		public ProductBuilder withName(String name) {
+			product.name = name;
+			return this;
+		}
+
+		public ProductBuilder withBondToClubCard(boolean isClubCardBonded) {
+			product.clubCardBonded = isClubCardBonded;
+			return this;
+		}
+
+		public ProductBuilder withPercentageDiscount(String percentageDiscount) {
+			product.percentageDiscount = percentageDiscount;
+			return this;
+		}
+
+		public ProductBuilder withPreviousPrice(double previousPrice) {
+			product.previousPrice = previousPrice;
+			return this;
+		}
+
+		public ProductBuilder withCurrentPrice(double price) {
+			product.price = price;
+			return this;
+		}
+
+		public ProductBuilder withMeasurementUnit(String quantityWithUnit) {
+			product.quantityWithUnit = quantityWithUnit;
+			return this;
+		}
+
+		public ProductBuilder withCategory(Category category) {
+			product.category = category;
+			return this;
+		}
+
+		public Product createProduct() {
+			return this.product;
+		}
 	}
 }

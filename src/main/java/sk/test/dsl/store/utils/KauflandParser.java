@@ -12,14 +12,15 @@ import sk.test.dsl.core.Category;
 import sk.test.dsl.core.HTMLProductParser;
 import sk.test.dsl.core.Product;
 
+// TODO: move default behavior into parent interface / abstract class for HtmlProductParser -> decimal format, general helper methods etc.
 public class KauflandParser implements HTMLProductParser {
 
 	private static final DecimalFormat PERCENTAGE_DISCOUNT_FORMAT = new DecimalFormat("0.#");
 
 	@Override
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
+		List<Product> products = new ArrayList<>(100);
 		Elements tiles = htmlPage.select(".g-col.o-overview-list__list-item");
-		List<Product> products = new ArrayList<>();
 
 		for (Element tile : tiles) {
 			Elements descriptionPart = tile.select(".m-offer-tile__text");
@@ -53,14 +54,15 @@ public class KauflandParser implements HTMLProductParser {
 				.select(".a-pricetag__old-price.a-pricetag__line-through")
 				.text();
 
-			Product product = new Product();
-			product.setName(resolveProductName(h5, h4));
-			product.setCategory(productsCategory);
-			product.setQuantityWithUnit(quantity);
-			setClubCardBondIfPresent(price, product);
-			product.setPrice(parsePrice(price));
-			product.setPreviousPrice(parsePrice(prevPrice));
-			product.setPercentageDiscount(parseDiscountPercentage(discountPercentage)); // ERROR: kava, caj, sladke, slane "1/2CENY!"
+			Product product = new Product.ProductBuilder()
+				.withName(resolveProductName(h5, h4))
+				.withCategory(productsCategory)
+				.withMeasurementUnit(quantity)
+				.withPercentageDiscount(parseDiscountPercentage(discountPercentage))
+				.withPreviousPrice(parsePrice(prevPrice))
+				.withCurrentPrice(parsePrice(price))
+				.withBondToClubCard(isClubCardBondPresent(price))
+				.createProduct();
 
 			products.add(product);
 		}
@@ -75,10 +77,11 @@ public class KauflandParser implements HTMLProductParser {
 		return title;
 	}
 
-	private void setClubCardBondIfPresent(String textPrice, Product product) {
+	private boolean isClubCardBondPresent(String textPrice) {
 		if (textPrice.indexOf(' ') >= 0) {
-			product.setClubCardBounded();
+			return true;
 		}
+		return false;
 	}
 
 	private String parseDiscountPercentage(String discountPercentage) {
