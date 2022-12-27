@@ -6,6 +6,7 @@ import static sk.test.dsl.core.Category.LAHODKY;
 import static sk.test.dsl.core.Category.MASO_UDENINY;
 import static sk.test.dsl.core.Category.MRAZENE_VYROBKY;
 import static sk.test.dsl.core.Category.NAPOJE;
+import static sk.test.dsl.core.Category.OSTATNE;
 import static sk.test.dsl.core.Category.OVOCIE_ZELENINA;
 import static sk.test.dsl.core.Category.PECIVO;
 import static sk.test.dsl.core.Category.TRVANLIVE_POTRAVINY;
@@ -31,6 +32,7 @@ public class KauflandURLMapper implements CategoryURLMapper {
 		CATEGORY_ENDPOINT_MAP.put(TRVANLIVE_POTRAVINY, appendToBaseUrl("06_Trvanliv%C3%A9_potraviny.html"));
 		CATEGORY_ENDPOINT_MAP.put(LAHODKY, appendToBaseUrl("05_Lah%C3%B4dky.html"));
 		CATEGORY_ENDPOINT_MAP.put(MRAZENE_VYROBKY, appendToBaseUrl("04_Mrazen%C3%A9_v%C3%BDrobky.html"));
+		CATEGORY_ENDPOINT_MAP.put(OSTATNE, appendToBaseUrl("default_Ostatné.html")); // ?
 	}
 
 	private static String appendToBaseUrl(String uri) {
