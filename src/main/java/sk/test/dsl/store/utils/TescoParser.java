@@ -1,8 +1,10 @@
 package sk.test.dsl.store.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -17,11 +19,25 @@ public class TescoParser implements HTMLProductParser {
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		List<Product> products = new ArrayList<>(250);
 
-		// removes the tiled displayed on the current page because when paged, we are getting also hidden tiles
-		// contained within previous pages including the current one, so we want to omit the duplicate tiles
-		htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
-				.select(".a-productListing__productsGrid__element")
-				.remove(); // when the top element is not there, this will not do anything
+		// TODO: when passed single page without pagination it automatically fails so it must be capable to select
+		// not hidden data this time.
+		
+		int hiddenTiles = htmlPage
+			.select(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
+			.select(".a-productListing__productsGrid__element")
+			.size();
+		
+		int visibleTiles = htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
+			.select(".a-productListing__productsGrid__element")
+			.size();
+
+		if (hiddenTiles >= visibleTiles) { // can they be equal? if so, then we don't care what the source is, but we do not want any duplicates
+			// removes the tiled displayed on the current page because when paged, we are getting also hidden tiles
+			// contained within previous pages including the current one, so we want to omit the duplicate tiles
+			htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
+					.select(".a-productListing__productsGrid__element")
+					.remove(); // when the top element is not there, this will not do anything
+		}
 
 		Elements tiles = htmlPage
 			.select(".a-productListing__productsGrid__element")
@@ -37,7 +53,7 @@ public class TescoParser implements HTMLProductParser {
 				continue;
 			}
 
-			String currentPrice = pricePartParent.select(".product__price-cc-text").get(1).text(); // tu padne smotana
+			String currentPrice = pricePartParent.select(".product__price-cc-text").get(1).text();
 			String quantityWithUnit = pricePartParent.select("div").get(1).text();
 			Element discountPart = tile.selectFirst(".product__discount-percentage");
 			String discountPercentage;
@@ -47,7 +63,7 @@ public class TescoParser implements HTMLProductParser {
 				discountPart = tile.selectFirst(".product__discount");
 				discountPercentage = discountPart.select(".saved_price__text").text();
 			} else {
-				discountPercentage = discountPart.selectFirst(".discount-percentage__text").text().replace(" ", ""); // toto sa meni
+				discountPercentage = discountPart.selectFirst(".discount-percentage__text").text().replace(" ", "");
 			}
 
 			String previousPrice = discountPart.select(".product__discount-normal-price").text();
@@ -91,10 +107,11 @@ public class TescoParser implements HTMLProductParser {
 		return Integer.parseInt(lastPage);
 	}
 
-//	public static void main(String[] args) throws IOException {
-//		TescoParser parser = new TescoParser();
-//		TescoURLMapper mapper = new TescoURLMapper();
-//		String url = mapper.getCategoryURLMap().get(Category.NAPOJE);
+	public static void main(String[] args) throws IOException {
+		TescoParser parser = new TescoParser();
+		TescoURLMapper mapper = new TescoURLMapper();
+		String url = mapper.getCategoryURLMap().get(Category.NAPOJE);
+		url = "https://tesco.sk/akciove-ponuky/akciove-produkty/napoje/";
 //		url = mapper.getPagedURLByCategory(Category.NAPOJE, parser.getNumberOfAvailablePages(Jsoup.connect(url).get()));
 
 		// I need to parse this when there is paging present... these are all items from previous pages until the current page (included)
@@ -119,7 +136,7 @@ public class TescoParser implements HTMLProductParser {
 //		  .select(".product__name")
 //		  .forEach(System.out::println);
 
-//		parser.parseHtmlProductsInfo(Jsoup.connect(url).get(), Category.NAPOJE).forEach(System.out::println);
+		parser.parseHtmlProductsInfo(Jsoup.connect(url).get(), Category.NAPOJE).forEach(System.out::println);
 		
-//	}
+	}
 }
