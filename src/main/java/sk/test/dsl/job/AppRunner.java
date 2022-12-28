@@ -10,8 +10,8 @@ import org.jsoup.nodes.Document;
 
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.Product;
-import sk.test.dsl.store.parser.TescoParser;
-import sk.test.dsl.store.parser.TescoURLMapper;
+import sk.test.dsl.product.parser.TescoParser;
+import sk.test.dsl.product.parser.TescoURLMapper;
 
 public class AppRunner {
 

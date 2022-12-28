@@ -1,4 +1,4 @@
-package sk.test.dsl.store.parser;
+package sk.test.dsl.product.parser;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

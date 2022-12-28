@@ -1,4 +1,4 @@
-package sk.test.dsl.store.parser;
+package sk.test.dsl.product.parser;
 
 import static sk.test.dsl.product.Category.CERSTVE_VYROBKY;
 import static sk.test.dsl.product.Category.MASO_UDENINY;

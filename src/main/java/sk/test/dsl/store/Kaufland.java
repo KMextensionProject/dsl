@@ -6,8 +6,8 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 import sk.test.dsl.product.Product;
-import sk.test.dsl.store.parser.KauflandParser;
-import sk.test.dsl.store.parser.KauflandURLMapper;
+import sk.test.dsl.product.parser.KauflandParser;
+import sk.test.dsl.product.parser.KauflandURLMapper;
 
 // list of products for this store should be updated / cached
 // who will update it, or where will it be actually stored?
