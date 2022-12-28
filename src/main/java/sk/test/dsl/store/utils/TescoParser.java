@@ -17,6 +17,12 @@ public class TescoParser implements HTMLProductParser {
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		List<Product> products = new ArrayList<>(250);
 
+		// removes the tiled displayed on the current page because when paged, we are getting also hidden tiles
+		// contained within previous pages including the current one, so we want to omit the duplicate tiles
+		htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
+				.select(".a-productListing__productsGrid__element")
+				.remove(); // when the top element is not there, this will not do anything
+
 		Elements tiles = htmlPage
 			.select(".a-productListing__productsGrid__element")
 			.select(".product__info-wrapper");
@@ -84,4 +90,36 @@ public class TescoParser implements HTMLProductParser {
 		String lastPage = pagination.get(pagination.size() - 1).text().trim();
 		return Integer.parseInt(lastPage);
 	}
+
+//	public static void main(String[] args) throws IOException {
+//		TescoParser parser = new TescoParser();
+//		TescoURLMapper mapper = new TescoURLMapper();
+//		String url = mapper.getCategoryURLMap().get(Category.NAPOJE);
+//		url = mapper.getPagedURLByCategory(Category.NAPOJE, parser.getNumberOfAvailablePages(Jsoup.connect(url).get()));
+
+		// I need to parse this when there is paging present... these are all items from previous pages until the current page (included)
+		// so I do not need to fetch every page...
+//		Jsoup.connect(url).get()
+//			.select(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
+//			.select(".a-productListing__productsGrid__element")
+//			.select(".product__info-wrapper")
+//			.select(".product__name")
+//			.forEach(System.out::println);
+//
+//		System.out.println("--------------------------------------------");
+
+        // but for duplicates I need to get rid of these unhidden elements on the last page, because they are already contained in the above element
+//		Elements el = Jsoup.connect(url).get()
+//			.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md");
+//				
+//		el.select(".a-productListing__productsGrid__element").remove();
+//		
+//		el.select(".a-productListing__productsGrid__element")
+//		  .select(".product__info-wrapper")
+//		  .select(".product__name")
+//		  .forEach(System.out::println);
+
+//		parser.parseHtmlProductsInfo(Jsoup.connect(url).get(), Category.NAPOJE).forEach(System.out::println);
+		
+//	}
 }
