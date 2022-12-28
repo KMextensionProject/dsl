@@ -1,4 +1,4 @@
-package sk.test.dsl.core;
+package sk.test.dsl.product;
 
 import java.util.EnumMap;
 

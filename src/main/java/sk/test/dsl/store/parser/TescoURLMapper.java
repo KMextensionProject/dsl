@@ -1,16 +1,16 @@
-package sk.test.dsl.store.utils;
+package sk.test.dsl.store.parser;
 
-import static sk.test.dsl.core.Category.CERSTVE_VYROBKY;
-import static sk.test.dsl.core.Category.MASO_UDENINY;
-import static sk.test.dsl.core.Category.MRAZENE_VYROBKY;
-import static sk.test.dsl.core.Category.NAPOJE;
-import static sk.test.dsl.core.Category.OVOCIE_ZELENINA;
-import static sk.test.dsl.core.Category.TRVANLIVE_POTRAVINY;
+import static sk.test.dsl.product.Category.CERSTVE_VYROBKY;
+import static sk.test.dsl.product.Category.MASO_UDENINY;
+import static sk.test.dsl.product.Category.MRAZENE_VYROBKY;
+import static sk.test.dsl.product.Category.NAPOJE;
+import static sk.test.dsl.product.Category.OVOCIE_ZELENINA;
+import static sk.test.dsl.product.Category.TRVANLIVE_POTRAVINY;
 
 import java.util.EnumMap;
 
-import sk.test.dsl.core.Category;
-import sk.test.dsl.core.CategoryURLMapper;
+import sk.test.dsl.product.Category;
+import sk.test.dsl.product.CategoryURLMapper;
 
 public class TescoURLMapper implements CategoryURLMapper {
 

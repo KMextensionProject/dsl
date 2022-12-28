@@ -1,4 +1,4 @@
-package sk.test.dsl.main;
+package sk.test.dsl.job;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -8,10 +8,10 @@ import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import sk.test.dsl.core.Category;
-import sk.test.dsl.core.Product;
-import sk.test.dsl.store.utils.TescoParser;
-import sk.test.dsl.store.utils.TescoURLMapper;
+import sk.test.dsl.product.Category;
+import sk.test.dsl.product.Product;
+import sk.test.dsl.store.parser.TescoParser;
+import sk.test.dsl.store.parser.TescoURLMapper;
 
 public class AppRunner {
 

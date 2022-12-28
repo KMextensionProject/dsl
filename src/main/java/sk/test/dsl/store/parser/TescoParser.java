@@ -1,4 +1,4 @@
-package sk.test.dsl.store.utils;
+package sk.test.dsl.store.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import sk.test.dsl.core.Category;
-import sk.test.dsl.core.HTMLProductParser;
-import sk.test.dsl.core.Product;
+import sk.test.dsl.product.Category;
+import sk.test.dsl.product.HTMLProductParser;
+import sk.test.dsl.product.Product;
 
 public class TescoParser implements HTMLProductParser {
 

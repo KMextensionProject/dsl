@@ -1,4 +1,4 @@
-package sk.test.dsl.store.utils;
+package sk.test.dsl.store.parser;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -8,9 +8,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import sk.test.dsl.core.Category;
-import sk.test.dsl.core.HTMLProductParser;
-import sk.test.dsl.core.Product;
+import sk.test.dsl.product.Category;
+import sk.test.dsl.product.HTMLProductParser;
+import sk.test.dsl.product.Product;
 
 // TODO: move default behavior into parent interface / abstract class for HtmlProductParser -> decimal format, general helper methods etc.
 public class KauflandParser implements HTMLProductParser {

@@ -1,13 +1,13 @@
-package sk.test.dsl.store.utils;
+package sk.test.dsl.store.parser;
 
 import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import sk.test.dsl.core.Category;
-import sk.test.dsl.core.HTMLProductParser;
-import sk.test.dsl.core.Product;
+import sk.test.dsl.product.Category;
+import sk.test.dsl.product.HTMLProductParser;
+import sk.test.dsl.product.Product;
 
 public class LidlParser implements HTMLProductParser {
 

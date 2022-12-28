@@ -1,7 +1,9 @@
-package sk.test.dsl.core;
+package sk.test.dsl.store;
 
 import java.time.DayOfWeek;
 import java.util.List;
+
+import sk.test.dsl.product.Product;
 
 public abstract class Store {
 
