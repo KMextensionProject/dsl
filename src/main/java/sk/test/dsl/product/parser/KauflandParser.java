@@ -7,12 +7,14 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
 // TODO: move default behavior into parent interface / abstract class for HtmlProductParser -> decimal format, general helper methods etc.
+@Component
 public class KauflandParser implements HTMLProductParser {
 
 	private static final DecimalFormat PERCENTAGE_DISCOUNT_FORMAT = new DecimalFormat("0.#");

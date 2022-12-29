@@ -1,5 +1,6 @@
 package sk.test.dsl.store;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -10,5 +11,7 @@ public abstract class Store {
 	public abstract List<DayOfWeek> getDiscountUpdatingDays();
 
 	public abstract List<Product> getDiscountProducts();
+
+	public abstract void updateDiscountProductList() throws IOException;
 
 }

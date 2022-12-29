@@ -13,9 +13,12 @@ import static sk.test.dsl.product.Category.TRVANLIVE_POTRAVINY;
 
 import java.util.EnumMap;
 
+import org.springframework.stereotype.Component;
+
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.CategoryURLMapper;
 
+@Component
 public class KauflandURLMapper implements CategoryURLMapper {
 
 	private static final String BASE_URL = "https://www.kaufland.sk/aktualna-ponuka/aktualny-tyzden/akciove-vyrobky.category=";

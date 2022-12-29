@@ -13,11 +13,13 @@ import java.util.Optional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
+@Component
 public class LidlParser implements HTMLProductParser {
 
 	@Override

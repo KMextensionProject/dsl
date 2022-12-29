@@ -6,16 +6,18 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
+@Component
 public class TescoParser implements HTMLProductParser {
 
 	@Override
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
-		List<Product> products = new ArrayList<>(150);
+		List<Product> products = new ArrayList<>(100);
 
 		// TODO: when passed single page without pagination it automatically fails so it must be capable to select
 		// not hidden data this time.

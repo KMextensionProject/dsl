@@ -7,9 +7,12 @@ import static sk.test.dsl.product.Category.PECIVO;
 
 import java.util.EnumMap;
 
+import org.springframework.stereotype.Component;
+
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.CategoryURLMapper;
 
+@Component
 public class LidlURLMapper implements CategoryURLMapper {
 
 	private static final String BASE_URL = "https://www.lidl.sk/c/";
