@@ -12,5 +12,7 @@ public enum Category {
 	LAHODKY,
 	MRAZENE_VYROBKY,
 	OSTATNE
+	
+	// TODO: add kvety + drogeria?
 
 }
