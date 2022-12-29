@@ -15,7 +15,7 @@ public class TescoParser implements HTMLProductParser {
 
 	@Override
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
-		List<Product> products = new ArrayList<>(250);
+		List<Product> products = new ArrayList<>(150);
 
 		// TODO: when passed single page without pagination it automatically fails so it must be capable to select
 		// not hidden data this time.
