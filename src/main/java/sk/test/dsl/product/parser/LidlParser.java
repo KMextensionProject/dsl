@@ -19,7 +19,7 @@ import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
-@Component
+@Component("lidlParser")
 public class LidlParser implements HTMLProductParser {
 
 	@Override

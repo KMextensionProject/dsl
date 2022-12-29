@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -22,17 +23,12 @@ import sk.test.dsl.product.parser.TescoURLMapper;
 @Component
 public class TescoStore extends Store {
 
-	private List<Product> discountProducts;
-
-	public TescoStore() {
-		this.discountProducts = new ArrayList<>(200);
+	@Autowired
+	public TescoStore(
+		@Qualifier("tescoURLMapper") TescoURLMapper urlMapper, 
+		@Qualifier("tescoParser") TescoParser parser) {
+		super(urlMapper, parser);
 	}
-
-	@Autowired
-	private TescoURLMapper mapper;
-
-	@Autowired
-	private TescoParser parser;
 
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
@@ -40,19 +36,14 @@ public class TescoStore extends Store {
 	}
 
 	@Override
-	public List<Product> getDiscountProducts() {
-		return new ArrayList<>(this.discountProducts);
-	}
-
-	@Override
 	public void updateDiscountProductList() throws IOException {
 		List<Product> products = new ArrayList<>(200);
-		for (Map.Entry<Category, String> entry : mapper.getCategoryURLMap().entrySet()) {
+		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			String baseCategoryUrl = entry.getValue();
-			int pages = parser.getNumberOfAvailablePages(Jsoup.connect(baseCategoryUrl).get());
-			Document pageWithAllProducts = Jsoup.connect(mapper.getPagedURLByCategory(category, pages)).get();
-			List<Product> categoryProducts = parser.parseHtmlProductsInfo(pageWithAllProducts, category);
+			int pages = ((TescoParser) productParser).getNumberOfAvailablePages(Jsoup.connect(baseCategoryUrl).get());
+			Document pageWithAllProducts = Jsoup.connect(((TescoURLMapper) urlMapper).getPagedURLByCategory(category, pages)).get();
+			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(pageWithAllProducts, category);
 			products.addAll(categoryProducts);
 		}
 		this.discountProducts = products;

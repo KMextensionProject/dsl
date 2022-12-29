@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -22,16 +23,11 @@ import sk.test.dsl.product.parser.LidlURLMapper;
 @Component
 public class LidlStore extends Store {
 
-	private List<Product> discountProducts;
-
 	@Autowired
-	private LidlURLMapper mapper;
-
-	@Autowired
-	private LidlParser parser;
-
-	public LidlStore() {
-		this.discountProducts = new ArrayList<>(150);
+	public LidlStore(
+		@Qualifier("lidlURLMapper") LidlURLMapper mapper, 
+		@Qualifier("lidlParser") LidlParser parser) {
+		super(mapper, parser);
 	}
 
 	@Override
@@ -40,17 +36,12 @@ public class LidlStore extends Store {
 	}
 
 	@Override
-	public List<Product> getDiscountProducts() {
-		return new ArrayList<>(this.discountProducts);
-	}
-
-	@Override
 	public void updateDiscountProductList() throws IOException {
 		List<Product> productList = new ArrayList<>(150);
-		for (Map.Entry<Category, String> entry : mapper.getCategoryURLMap().entrySet()) {
+		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			Document categoryPage = Jsoup.connect(entry.getValue()).get();
-			List<Product> categoryProducts = parser.parseHtmlProductsInfo(categoryPage, category);
+			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(categoryPage, category);
 			productList.addAll(categoryProducts);
 		}
 		this.discountProducts = productList;

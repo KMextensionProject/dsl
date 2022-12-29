@@ -12,7 +12,7 @@ import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
-@Component
+@Component("tescoParser")
 public class TescoParser implements HTMLProductParser {
 
 	@Override

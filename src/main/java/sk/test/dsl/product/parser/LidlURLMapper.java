@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.CategoryURLMapper;
 
-@Component
+@Component("lidlURLMapper")
 public class LidlURLMapper implements CategoryURLMapper {
 
 	private static final String BASE_URL = "https://www.lidl.sk/c/";
