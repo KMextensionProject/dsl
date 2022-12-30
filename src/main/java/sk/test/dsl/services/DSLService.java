@@ -1,9 +1,13 @@
 package sk.test.dsl.services;
 
+import static java.util.stream.Collectors.toList;
+import static sk.test.dsl.utils.StringUtils.containsIgnoreCase;
+import static sk.test.dsl.utils.StringUtils.stripDiacritics;
+
 import java.time.DayOfWeek;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +17,9 @@ import sk.test.dsl.product.Product;
 import sk.test.dsl.store.KauflandStore;
 import sk.test.dsl.store.LidlStore;
 import sk.test.dsl.store.Store;
+import sk.test.dsl.store.StoreName;
 import sk.test.dsl.store.TescoStore;
+
 
 @Service
 public class DSLService {
@@ -27,27 +33,53 @@ public class DSLService {
 	@Autowired
 	private LidlStore lidl;
 
-//	 store id will come from path variable and we could have only one controller class then
-//	public Set<Category> getAvailableProductCategories(int storeId) {
-//		return getURLMapper(storeId).getCategoryURLMap().keySet();
-//	}
-
-	public List<DayOfWeek> getDiscountUpdatingDays(Store store) {
-		return store.getDiscountUpdatingDays();
+	public Set<Category> getAvailableProductCategories(StoreName storeName) {
+		return getCorrespondingStoreInstance(storeName)
+			.getUrlMapper()
+			.getCategoryURLMap()
+			.keySet();
 	}
 
-	public List<Product> getDiscountProducts(String productCategory, Store store) {
-		List<Product> discountProducts = store.getDiscountProducts();
-		if (productCategory != null) {
-			if (Category.contains(productCategory)) {
-				Category category = Category.valueOf(productCategory.toUpperCase());
-				return discountProducts.stream()
-					.filter(e -> e.getCategory() == category)
-					.collect(Collectors.toList());
-			} else {
-				return Collections.emptyList();
-			}
+	public List<DayOfWeek> getDiscountUpdatingDays(StoreName storeName) {
+		return getCorrespondingStoreInstance(storeName).getDiscountUpdatingDays();
+	}
+
+	public List<Product> getDiscountProducts(StoreName storeName, Category category, String name) {
+		List<Product> discountProducts = getCorrespondingStoreInstance(storeName).getDiscountProducts();
+		if (category == null && name == null) {
+			return discountProducts;
 		}
-		return discountProducts;
+		return turnProductQueryToStream(discountProducts, category, name)
+			.collect(toList());
+	}
+
+	private Stream<Product> turnProductQueryToStream(List<Product> products, Category category, String name) {
+		Stream<Product> productStream = products.stream();
+		if (category != null) {
+			productStream = productStream.filter(e -> e.getCategory() == category);
+		}
+		if (name != null) {
+			productStream = productStream.filter(e -> hasMatchInProductName(e, name));
+		}
+		return productStream;
+	}
+
+	private boolean hasMatchInProductName(Product product, String name) {
+		String productFullName = stripDiacritics(product.getName());
+		String lookupNamePart = stripDiacritics(name);
+		return containsIgnoreCase(productFullName, lookupNamePart);
+	}
+
+	private Store getCorrespondingStoreInstance(StoreName store) {
+		switch(store) {
+		case KAUFLAND:
+			return kaufland;
+		case TESCO:
+			return tesco;
+		case LIDL:
+			return lidl;
+		default:
+			throw new IllegalArgumentException("store mus be one of " + StoreName.values());
+		}
 	}
 }

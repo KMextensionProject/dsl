@@ -37,7 +37,7 @@ public class TescoStore extends Store {
 
 	@Override
 	public void updateDiscountProductList() throws IOException {
-		List<Product> products = new ArrayList<>(200);
+		List<Product> products = new ArrayList<>(400);
 		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			String baseCategoryUrl = entry.getValue();

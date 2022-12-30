@@ -3,6 +3,7 @@ package sk.test.dsl.config;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Component
 public class WebAppInitializer implements WebMvcConfigurer {
+
+	// so the string values from @PathVariables and @RequestParameters can be translated into Enums
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverter(new StringToStoreNameConverter());
+		registry.addConverter(new StringToCategoryConverter());
+	}
 
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

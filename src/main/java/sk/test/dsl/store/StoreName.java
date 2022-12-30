@@ -1,6 +1,6 @@
 package sk.test.dsl.store;
 
-public enum StoreEnum {
+public enum StoreName {
 
 	KAUFLAND,
 	TESCO,
