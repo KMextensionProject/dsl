@@ -1,7 +1,7 @@
 package sk.test.dsl.services;
 
 import static java.util.stream.Collectors.toList;
-import static sk.test.dsl.utils.StringUtils.containsIgnoreCase;
+import static sk.test.dsl.utils.StringUtils.containsPhrase;
 import static sk.test.dsl.utils.StringUtils.stripDiacritics;
 
 import java.time.DayOfWeek;
@@ -66,8 +66,7 @@ public class DSLService {
 	private boolean hasMatchInProductName(Product product, String name) {
 		String productFullName = stripDiacritics(product.getName());
 		String lookupNamePart = stripDiacritics(name);
-		// pri hladani slovneho spojenia, hladat zhodu oboch v jednom nazve
-		return containsIgnoreCase(productFullName, lookupNamePart);
+		return containsPhrase(productFullName, lookupNamePart);
 	}
 
 	private Store getCorrespondingStoreInstance(StoreName store) {

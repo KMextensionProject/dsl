@@ -10,8 +10,28 @@ public class StringUtils {
 			.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 	}
 
-	public static boolean containsIgnoreCase(String source, String target) {
-		return source.toLowerCase().contains(target.toLowerCase());
+	/**
+	 * 
+	 * @param source
+	 * @param target
+	 * @return
+	 */
+	public static boolean containsPhrase(String source, String phrase) {
+		if (source.length() < phrase.length()) {
+			return false;
+		}
+		String sourceText = source.toLowerCase();
+		String lookupText = phrase.toLowerCase();
+		if (phrase.indexOf(' ') < 0) {
+			return sourceText.contains(lookupText);
+		}
+		String[] lookupWords = phrase.split(" ");
+		int matchesFound = 0;
+		for (String lookupWord : lookupWords) {
+			if (sourceText.contains(lookupWord)) {
+				matchesFound++;
+			}
+		}
+		return matchesFound == lookupWords.length;
 	}
-
 }
