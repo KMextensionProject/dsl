@@ -15,13 +15,14 @@ import sk.test.dsl.product.Product;
 @Component("tescoParser")
 public class TescoParser implements HTMLProductParser {
 
+	// TODO: replace by calling url that returns json which was not noticed until now..this is the url:
+	// https://tesco.sk/Ajax?apage=1&limit=500&type=load-more-products&path=/akciove-ponuky/akciove-produkty/&get={}&page_url=/akciove-ponuky/akciove-produkty
+
 	@Override
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		List<Product> products = new ArrayList<>(100);
 
-		// TODO: when passed single page without pagination it automatically fails so it must be capable to select
-		// not hidden data this time.
-
+		// toto funguje
 		int hiddenTiles = htmlPage
 			.selectFirst(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
 			.select(".a-productListing__productsGrid__element")
@@ -36,6 +37,10 @@ public class TescoParser implements HTMLProductParser {
 			// removes the tiled displayed on the current page because when paged, we are getting also hidden tiles
 			// contained within previous pages including the current one, so we want to omit the duplicate tiles
 			htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
+				.select(".a-productListing__productsGrid__element")
+				.remove(); // when the top element is not there, this will not do anything
+		} else {
+			htmlPage.select(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
 				.select(".a-productListing__productsGrid__element")
 				.remove(); // when the top element is not there, this will not do anything
 		}

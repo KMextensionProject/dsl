@@ -20,7 +20,6 @@ import sk.test.dsl.store.Store;
 import sk.test.dsl.store.StoreName;
 import sk.test.dsl.store.TescoStore;
 
-
 @Service
 public class DSLService {
 
@@ -67,6 +66,7 @@ public class DSLService {
 	private boolean hasMatchInProductName(Product product, String name) {
 		String productFullName = stripDiacritics(product.getName());
 		String lookupNamePart = stripDiacritics(name);
+		// pri hladani slovneho spojenia, hladat zhodu oboch v jednom nazve
 		return containsIgnoreCase(productFullName, lookupNamePart);
 	}
 
