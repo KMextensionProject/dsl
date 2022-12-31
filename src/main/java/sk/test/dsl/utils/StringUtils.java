@@ -25,7 +25,7 @@ public class StringUtils {
 		if (phrase.indexOf(' ') < 0) {
 			return sourceText.contains(lookupText);
 		}
-		String[] lookupWords = phrase.split(" ");
+		String[] lookupWords = lookupText.split(" ");
 		int matchesFound = 0;
 		for (String lookupWord : lookupWords) {
 			if (sourceText.contains(lookupWord)) {
