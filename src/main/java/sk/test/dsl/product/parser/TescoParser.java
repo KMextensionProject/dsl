@@ -22,28 +22,7 @@ public class TescoParser implements HTMLProductParser {
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) {
 		List<Product> products = new ArrayList<>(100);
 
-		// toto funguje
-		int hiddenTiles = htmlPage
-			.selectFirst(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
-			.select(".a-productListing__productsGrid__element")
-			.size();
-
-		int visibleTiles = htmlPage
-			.selectFirst(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
-			.select(".a-productListing__productsGrid__element")
-			.size();
-
-		if (hiddenTiles >= visibleTiles) { // can they be equal? if so, then we don't care what the source is, but we do not want any duplicates
-			// removes the tiled displayed on the current page because when paged, we are getting also hidden tiles
-			// contained within previous pages including the current one, so we want to omit the duplicate tiles
-			htmlPage.select(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
-				.select(".a-productListing__productsGrid__element")
-				.remove(); // when the top element is not there, this will not do anything
-		} else {
-			htmlPage.select(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
-				.select(".a-productListing__productsGrid__element")
-				.remove(); // when the top element is not there, this will not do anything
-		}
+		removeDuplicateTiles(htmlPage);
 
 		Elements tiles = htmlPage
 			.select(".a-productListing__productsGrid__element")
@@ -81,13 +60,39 @@ public class TescoParser implements HTMLProductParser {
 				.withPercentageDiscount(discountPercentage)
 				.withPreviousPrice(parsePrice(previousPrice))
 				.withCurrentPrice(parsePrice(currentPrice))
-				.withBondToClubCard(true) // almost everything.. check for different state on web
+				.withBondToClubCard(true) // did not find the other case
 				.createProduct();
 
 			products.add(product);
 		}
 
 		return products;
+	}
+
+	private void removeDuplicateTiles(Document htmlPage) {
+		/*
+		 * all tesco pages have the tiles from previous pages loaded into hidden elements,
+		 * this also happens when there is only one page, but hidden elements contain all
+		 * the visible tiles as duplicates
+		 */
+		Elements hiddenTiles = htmlPage
+			.selectFirst(".product-container.m-productListing__productsGrid.mobile.hidden.visible-xx-fixed.visible-xs-fixed.visible-sm-fixed")
+			.select(".a-productListing__productsGrid__element");
+
+		Elements visibleTiles = htmlPage
+			.selectFirst(".product-container.m-productListing__productsGrid.desktop.hidden.visible-md")
+			.select(".a-productListing__productsGrid__element");
+
+		/*
+		 * when paged, we need to delete all the visible tiles which appear on the current page
+		 * because hidden elements contain them all, otherwise the hidden elements must be removed
+		 * due to possible inconsistency with visible ones
+		 */
+		if (hiddenTiles.size() >= visibleTiles.size()) {
+			visibleTiles.remove();
+		} else {
+			hiddenTiles.remove();
+		}
 	}
 
 	private double parsePrice(String textPrice) {
