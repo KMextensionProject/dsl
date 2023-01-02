@@ -2,12 +2,15 @@ package sk.test.dsl.controllers;
 
 import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -43,6 +46,12 @@ public class DSLController {
 			@RequestParam(name = "category", required = false) Category category,
 			@RequestParam(name = "productName", required = false) String productName) {
 		return service.getDiscountProducts(store, category, productName);
+	}
+
+	@PostMapping(path = "/", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+	@ResponseBody
+	public List<Map<String, List<Map<String, Object>>>> resolveDSL(@RequestBody List<String> shoppingList) {
+		return service.resolveDSL(shoppingList);
 	}
 
 }

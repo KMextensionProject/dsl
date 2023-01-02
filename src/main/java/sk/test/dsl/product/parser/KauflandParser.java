@@ -14,6 +14,7 @@ import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
 
 // TODO: move default behavior into parent interface / abstract class for HtmlProductParser -> decimal format, general helper methods etc.
+// TODO: vyjebat toto: m-accordion__item m-accordion__item--level-2 -> to su linky na dodatocne akciove obdobia
 @Component("kauflandParser")
 public class KauflandParser implements HTMLProductParser {
 

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import sk.test.dsl.store.LidlStore;
 import sk.test.dsl.store.Store;
 import sk.test.dsl.store.StoreName;
 import sk.test.dsl.store.TescoStore;
+
+// TODO: upratat ten bordel dole
 
 @Service
 public class DSLService {
@@ -89,15 +92,12 @@ public class DSLService {
 		}
 	}
 
-	// TODO: prerobit tuto metodu a jej podmetody genericky, ked pridam 3 nove obchody, tak nech nemusim
-	// na tomto mieste nic uz pisat
-	public void resolveDSL(List<String> shoppingList) {
+	public List<Map<String, List<Map<String, Object>>>> resolveDSL(List<String> shoppingList) {
 
 		// TODO: thing through and exchange for Pair object where map functionality is not needed
 		List<Map<String, List<Map<String, Object>>>> dsl = new ArrayList<>(shoppingList.size());
 
 		for (String productName : shoppingList) {
-
 			Map<String, List<Map<String, Object>>> productForDSL = new HashMap<>();
 			Map<StoreName, List<Product>> foundProductByStore = searchStoresForProduct(productName);
 
@@ -110,19 +110,35 @@ public class DSLService {
 
 			if (isProductComparable(foundProductByStore)) {
 				Map<StoreName, Product> bestOffer = getBestStoreOffer(getAsSingleProductMap(foundProductByStore));
-				// TODO: ak je tu viac obchodov co ma ten produkt, znamena to, ze maju rovnaku cenu a tu treba spravit aj to,
-				// ze sa appendne nie len jeden obchod ako best ale oba...takze upravit tuto medotu dole, nech vrati jeden produkt
-				// s popisom ze sa da kupit v oboch StoreName
 				productForDSL.put(productName, toProductListWithStoreElement(bestOffer));
 				dsl.add(productForDSL);
 			} else {
 				// ak maju toho v sebe viac, ze sa neda urcit kde je to vyhodne dame tam nie viac obchodov, ale nech sa na UI zobrazi drop down list,
 				// kde sa daju potom produkty vybrat, lebo program to nedokaze
 
+				// separate method ? 
+				// try to generalize it so it functionality can be reused even in the if statement above
+				List<Map<String, Object>> productMaps = new ArrayList<>();
+				for (Map.Entry<StoreName, List<Product>> product : foundProductByStore.entrySet()) {
+					String store = product.getKey().name();
+					productMaps.addAll(product.getValue()
+						.stream()
+						.map(Product::toMap)
+						// method reference?
+						.map(e-> {
+							e.put("store", store); 
+							return e;
+						})
+						.collect(toList()));
+				}
+				productForDSL.put(productName, productMaps); 
+				dsl.add(productForDSL);
 			}
 		}
 
 		// return sorted by best offer store (any or to je jedno su posledne) -> any nemam - to je null takze null su posledne
+		// sortnut to moze aj UI
+		return dsl;
 	}
 
 	private Map<StoreName, List<Product>> searchStoresForProduct(String productName) {
@@ -178,16 +194,21 @@ public class DSLService {
 		return multiplePotentialbestOffers;
 	}
 
+	// this method always returns list with one element
 	private List<Map<String, Object>> toProductListWithStoreElement(Map<StoreName, Product> bestOffer) {
-		return bestOffer.entrySet()
+		List<Map<String, Object>> productList = new ArrayList<>(1);
+
+		String bestOfferStoreValue = bestOffer.keySet()
 			.stream()
-			.map(this::appendStoreName)
-			.collect(toList());
+			.map(StoreName::name)
+			.collect(Collectors.joining("/"));
+
+		Map<String, Object> productMap = bestOffer.entrySet().iterator().next().getValue().toMap();
+		productMap.put("best_offer_store", bestOfferStoreValue);
+		productList.add(productMap);
+
+		return productList;
 	}
 
-	private Map<String, Object> appendStoreName(Map.Entry<StoreName, Product> entry) {
-		Map<String, Object> productMap = entry.getValue().toMap();
-		productMap.put("best_offer_store", entry.getKey());
-		return productMap;
-	}
 }
+
