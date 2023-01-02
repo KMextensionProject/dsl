@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -41,14 +43,26 @@ public class KauflandStore extends Store {
 
 	@Override
 	public void updateDiscountProductList() throws IOException {
-		List<Product> products = new ArrayList<>(200);
+		Set<Product> products = new HashSet<>(250);
+
+		// GET by standard categories 
 		EnumMap<Category, String> categoryUrls = urlMapper.getCategoryURLMap();
 		for (Map.Entry<Category, String> entry : categoryUrls.entrySet()) {
 			Document htmlPage = Jsoup.connect(entry.getValue()).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(htmlPage, entry.getKey());
 			products.addAll(categoryProducts);
 		}
-		this.discountProducts = Collections.unmodifiableList(products);
+
+		// GET by special categories
+		Document pageWithCategoryMenu = Jsoup.connect(categoryUrls.get(Category.OSTATNE)).get();
+		List<String> specialCategoryUrls = ((KauflandParser) productParser).extractSpecialCategoryURLs(pageWithCategoryMenu);
+		for (String menuUrl : specialCategoryUrls) {
+			Document additionalCategoryPage = Jsoup.connect("https://www.kaufland.sk" + menuUrl).get();
+			List<Product> additionalCategoryProducts = productParser.parseHtmlProductsInfo(additionalCategoryPage, Category.OSTATNE);
+			products.addAll(additionalCategoryProducts);
+		}
+
+		this.discountProducts = Collections.unmodifiableList(new ArrayList<>(products));
 	}
 
 	@PostConstruct

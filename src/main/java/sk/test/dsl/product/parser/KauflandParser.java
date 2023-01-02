@@ -110,4 +110,11 @@ public class KauflandParser implements HTMLProductParser {
 		}
 		return Double.parseDouble(price);
 	}
+
+	public List<String> extractSpecialCategoryURLs(Document htmlPageWithCategoryMenu) {
+		return htmlPageWithCategoryMenu.select(".m-accordion__body").get(1)
+			.select(".m-accordion__list.m-accordion__list--level-2")
+			.select(".m-accordion__link")
+			.eachAttr("href");
+	}
 }
