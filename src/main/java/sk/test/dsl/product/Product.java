@@ -1,5 +1,8 @@
 package sk.test.dsl.product;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Product {
 
 	private Category category;
@@ -46,13 +49,25 @@ public class Product {
 		return clubCardBonded;
 	}
 
+	public Map<String, Object> toMap() {
+		Map<String, Object> productMap = new HashMap<>();
+		productMap.put("category", category);
+		productMap.put("name", name);
+		productMap.put("quantity_with_unit", quantityWithUnit);
+		productMap.put("price", price);
+		productMap.put("previous_price", previousPrice);
+		productMap.put("percentage_discount", percentageDiscount);
+		productMap.put("club_card_bounded", clubCardBonded);
+		return productMap;
+	}
+
 	@Override
 	public String toString() {
 		return "Product [category=" + category + ", name=" + name + ", quantityWithUnit=" + quantityWithUnit
 			+ ", price=" + price + ", previousPrice=" + previousPrice + ", percentageDiscount=" + percentageDiscount
 			+ ", clubCardBounded=" + clubCardBonded + "]";
 	}
-	
+
 	public static class ProductBuilder {
 
 		private final Product product = new Product();

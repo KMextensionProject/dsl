@@ -3,6 +3,7 @@ package sk.test.dsl.store;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,8 @@ public class TescoStore extends Store {
 
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
-		return Collections.emptyList();
+		// we've noticed little changes every day since the discount products availability is timed
+		return Arrays.asList(DayOfWeek.values());
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class TescoStore extends Store {
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(pageWithAllProducts, category);
 			products.addAll(categoryProducts);
 		}
-		this.discountProducts = products;
+		this.discountProducts = Collections.unmodifiableList(products);
 	}
 
 	@PostConstruct

@@ -44,7 +44,7 @@ public class LidlStore extends Store {
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(categoryPage, category);
 			productList.addAll(categoryProducts);
 		}
-		this.discountProducts = productList;
+		this.discountProducts = Collections.unmodifiableList(productList);
 	}
 
 	@PostConstruct

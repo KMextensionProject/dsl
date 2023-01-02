@@ -2,7 +2,7 @@ package sk.test.dsl.store;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import sk.test.dsl.product.CategoryURLMapper;
@@ -18,7 +18,7 @@ public abstract class Store {
 	public Store(CategoryURLMapper mapper, HTMLProductParser parser) {
 		this.urlMapper = mapper;
 		this.productParser = parser;
-		this.discountProducts = new ArrayList<>(200);
+		this.discountProducts = Collections.emptyList();
 	}
 
 	public abstract List<DayOfWeek> getDiscountUpdatingDays();
@@ -34,6 +34,6 @@ public abstract class Store {
 	}
 
 	public List<Product> getDiscountProducts() {
-		return new ArrayList<>(this.discountProducts);
+		return this.discountProducts;
 	}
 }

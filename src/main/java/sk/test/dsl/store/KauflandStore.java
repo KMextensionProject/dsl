@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class KauflandStore extends Store {
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(htmlPage, entry.getKey());
 			products.addAll(categoryProducts);
 		}
-		this.discountProducts = products;
+		this.discountProducts = Collections.unmodifiableList(products);
 	}
 
 	@PostConstruct
