@@ -2,6 +2,7 @@ package sk.test.dsl.product;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Product {
 
@@ -59,6 +60,19 @@ public class Product {
 		productMap.put("percentage_discount", percentageDiscount);
 		productMap.put("club_card_bounded", clubCardBonded);
 		return productMap;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Product) {
+			return ((Product) obj).name.equals(this.name);
+		}
+		return false;
 	}
 
 	@Override
