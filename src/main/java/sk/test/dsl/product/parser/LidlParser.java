@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import sk.test.dsl.product.Category;
 import sk.test.dsl.product.HTMLProductParser;
 import sk.test.dsl.product.Product;
+import static sk.test.dsl.product.parser.LidlURLMapper.BASE_URL;
 
 @Component("lidlParser")
 public class LidlParser implements HTMLProductParser {
@@ -38,12 +39,11 @@ public class LidlParser implements HTMLProductParser {
 	}
 
 	private List<String> parseProductCanonicalUrls(Document htmlPage) {
-		String basePageUrl = "https://www.lidl.sk";
 		return htmlPage
 			.selectFirst(".ACampaignGrid")
 			.select(".ACampaignGrid__item.ACampaignGrid__item--product")
 			.stream()
-			.map(p -> basePageUrl + p.getElementsByAttribute("canonicalUrl").first().attr("canonicalUrl"))
+			.map(p -> BASE_URL + p.getElementsByAttribute("canonicalUrl").first().attr("canonicalUrl"))
 			.collect(toList());
 	}
 
@@ -84,5 +84,19 @@ public class LidlParser implements HTMLProductParser {
 			.withCurrentPrice(Double.parseDouble(currentPrice))
 			.withCategory(category)
 			.createProduct());
+	}
+
+	public List<String> extractDynamicCategoryUrls() throws IOException {
+		Document mainPage = Jsoup.connect(BASE_URL).get();
+		String discountPageURL = mainPage.select(".n-header__main-navigation-link").get(1).attr("href");
+		discountPageURL += "&channel=store&tabCode=Current_Sales_Week";
+		if (!discountPageURL.startsWith("http")) {
+			discountPageURL = BASE_URL + discountPageURL;
+		}
+
+		return Jsoup.connect(discountPageURL).get()
+			.select(".ATheHeroStage__SliderTrack.m-ux-slider-track-distances-8").get(1)
+			.select(".ATheHeroStage__Offer > a")
+			.eachAttr("href");
 	}
 }

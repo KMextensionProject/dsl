@@ -5,8 +5,13 @@ import static sk.test.dsl.product.Category.OSTATNE;
 import static sk.test.dsl.product.Category.OVOCIE_ZELENINA;
 import static sk.test.dsl.product.Category.PECIVO;
 
+import java.io.IOException;
 import java.util.EnumMap;
+import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -15,24 +20,54 @@ import sk.test.dsl.product.CategoryURLMapper;
 @Component("lidlURLMapper")
 public class LidlURLMapper implements CategoryURLMapper {
 
-	private static final String BASE_URL = "https://www.lidl.sk/c/";
-	private static final EnumMap<Category, String> CATEGORY_ENDPOINT_MAP;
+	public static final String BASE_URL = "https://www.lidl.sk";
 
-	static {
-		CATEGORY_ENDPOINT_MAP = new EnumMap<>(Category.class);
-		CATEGORY_ENDPOINT_MAP.put(MASO_UDENINY, appendToBaseUrl("cerstve-maso-a-ryby/a10016161?channel=store&tabCode=Current_Sales_Week"));
-		CATEGORY_ENDPOINT_MAP.put(OVOCIE_ZELENINA, appendToBaseUrl("ovocie-a-zelenina/a10016163?channel=store&tabCode=Current_Sales_Week"));
-		CATEGORY_ENDPOINT_MAP.put(PECIVO, appendToBaseUrl("priamo-z-pece/a10016162?channel=store&tabCode=Current_Sales_Week"));
-		CATEGORY_ENDPOINT_MAP.put(OSTATNE, appendToBaseUrl("cenove-hity/a10015981?channel=store&tabCode=Current_Sales_Week"));
-	}
+	private final EnumMap<Category, String> categoryEndpointMap;
 
-	private static String appendToBaseUrl(String uri) {
-		return BASE_URL + uri;
+	@Autowired
+	private LidlParser parser;
+
+	public LidlURLMapper() {
+		this.categoryEndpointMap = new EnumMap<>(Category.class);
 	}
 
 	@Override
 	public EnumMap<Category, String> getCategoryURLMap() {
-		return new EnumMap<>(CATEGORY_ENDPOINT_MAP);
+		return new EnumMap<>(categoryEndpointMap);
 	}
 
+	@PostConstruct
+	private void initializeDynamicCategoryEndpoints() {
+		try {
+			List<String> categoryUrls = parser.extractDynamicCategoryUrls();
+			for (String categoryUrl : categoryUrls) {
+				addCategoryURLEntry(categoryUrl);
+				if (categoryEndpointMap.size() == 4) {
+					break;
+				}
+			}
+		} catch (IOException ex) {
+			System.out.println(ex.getMessage());
+			System.exit(500);
+		}
+	}
+
+	private void addCategoryURLEntry(String categoryUrl) {
+		if (categoryUrl.contains("maso")) {
+			categoryEndpointMap.put(MASO_UDENINY, appendHostIfMissing(categoryUrl));
+		} else if (categoryUrl.contains("ovocie")) {
+			categoryEndpointMap.put(OVOCIE_ZELENINA, appendHostIfMissing(categoryUrl));
+		} else if (categoryUrl.contains("priamo")) {
+			categoryEndpointMap.put(PECIVO, appendHostIfMissing(categoryUrl));
+		} else if (categoryUrl.contains("hity")) {
+			categoryEndpointMap.put(OSTATNE, appendHostIfMissing(categoryUrl));
+		}
+	}
+
+	private String appendHostIfMissing(String categoryUrl) {
+		if (!categoryUrl.startsWith("http")) {
+			return BASE_URL + categoryUrl;
+		}
+		return categoryUrl;
+	}
 }
