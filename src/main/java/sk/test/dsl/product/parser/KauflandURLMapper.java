@@ -21,7 +21,8 @@ import sk.test.dsl.product.CategoryURLMapper;
 @Component("kauflandURLMapper")
 public class KauflandURLMapper implements CategoryURLMapper {
 
-	private static final String BASE_URL = "https://www.kaufland.sk/aktualna-ponuka/aktualny-tyzden/akciove-vyrobky.category=";
+	public static final String BASE_URL = "https://www.kaufland.sk";
+
 	private static final EnumMap<Category, String> CATEGORY_ENDPOINT_MAP;
 
 	static {
@@ -39,7 +40,7 @@ public class KauflandURLMapper implements CategoryURLMapper {
 	}
 
 	private static String appendToBaseUrl(String uri) {
-		return BASE_URL + uri;
+		return BASE_URL + "/aktualna-ponuka/aktualny-tyzden/akciove-vyrobky.category=" + uri;
 	}
 
 	@Override

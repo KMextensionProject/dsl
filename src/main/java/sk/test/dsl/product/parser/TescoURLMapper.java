@@ -17,10 +17,10 @@ import sk.test.dsl.product.CategoryURLMapper;
 @Component("tescoURLMapper")
 public class TescoURLMapper implements CategoryURLMapper {
 
-	private static final String BASE_URL = "https://tesco.sk/akciove-ponuky/akciove-produkty/";
+	public static final String BASE_URL = "https://www.tesco.sk";
+
 	private static final EnumMap<Category, String> CATEGORY_ENDPOINT_MAP;
 
-	// TODO: review mappings since categories intersect
 	static {
 		CATEGORY_ENDPOINT_MAP = new EnumMap<>(Category.class);
 		CATEGORY_ENDPOINT_MAP.put(MASO_UDENINY, appendToBaseUrl("maso-ryby-a-udeniny/"));
@@ -32,7 +32,7 @@ public class TescoURLMapper implements CategoryURLMapper {
 	}
 
 	private static String appendToBaseUrl(String uri) {
-		return BASE_URL + uri;
+		return BASE_URL + "/akciove-ponuky/akciove-produkty/" + uri;
 	}
 
 	@Override
