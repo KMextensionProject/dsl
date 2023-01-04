@@ -28,7 +28,7 @@ import sk.test.dsl.store.Store;
 import sk.test.dsl.store.StoreName;
 import sk.test.dsl.store.TescoStore;
 
-// TODO: upratat ten bordel dole
+// TODO: thing through and exchange for Pair object where map functionality is not needed
 
 @Service
 public class DSLService {
@@ -93,8 +93,6 @@ public class DSLService {
 	}
 
 	public List<Map<String, List<Map<String, Object>>>> resolveDSL(List<String> shoppingList) {
-
-		// TODO: thing through and exchange for Pair object where map functionality is not needed
 		List<Map<String, List<Map<String, Object>>>> dsl = new ArrayList<>(shoppingList.size());
 
 		for (String productName : shoppingList) {
@@ -102,42 +100,18 @@ public class DSLService {
 			Map<StoreName, List<Product>> foundProductByStore = searchStoresForProduct(productName);
 
 			if (foundProductByStore.isEmpty()) {
-				// product is not found in any store's discount list
 				productForDSL.put(productName, null);
-				dsl.add(productForDSL);
-				continue;
-			}
-
-			if (isProductComparable(foundProductByStore)) {
+			} else if (isProductComparable(foundProductByStore)) {
 				Map<StoreName, Product> bestOffer = getBestStoreOffer(getAsSingleProductMap(foundProductByStore));
-				productForDSL.put(productName, toProductListWithStoreElement(bestOffer));
-				dsl.add(productForDSL);
+				productForDSL.put(productName, toSingleProductListWithStoreElement(bestOffer));
 			} else {
-				// ak maju toho v sebe viac, ze sa neda urcit kde je to vyhodne dame tam nie viac obchodov, ale nech sa na UI zobrazi drop down list,
-				// kde sa daju potom produkty vybrat, lebo program to nedokaze
-
-				// separate method ? 
-				// try to generalize it so it functionality can be reused even in the if statement above
-				List<Map<String, Object>> productMaps = new ArrayList<>();
-				for (Map.Entry<StoreName, List<Product>> product : foundProductByStore.entrySet()) {
-					String store = product.getKey().name();
-					productMaps.addAll(product.getValue()
-						.stream()
-						.map(Product::toMap)
-						// method reference?
-						.map(e-> {
-							e.put("store", store); 
-							return e;
-						})
-						.collect(toList()));
-				}
-				productForDSL.put(productName, productMaps); 
-				dsl.add(productForDSL);
+				List<Map<String, Object>> productMaps = toProductListWithStoreElement(foundProductByStore);
+				productForDSL.put(productName, productMaps);
 			}
+
+			dsl.add(productForDSL);
 		}
 
-		// return sorted by best offer store (any or to je jedno su posledne) -> any nemam - to je null takze null su posledne
-		// sortnut to moze aj UI
 		return dsl;
 	}
 
@@ -152,9 +126,14 @@ public class DSLService {
 		return productsFound;
 	}
 
+	/*
+	 * if we found only one product in each store, than there is possibility to pick the best offer 
+	 * if there were multiple products found in one store for the searched value and others have 
+	 * only one product...there is indication that the client request could be more specific and 
+	 * so we are not able to pick the correct result
+	 */
 	private boolean isProductComparable(Map<StoreName, List<Product>> productsByStore) {
 		Collection<List<Product>> foundProducts = productsByStore.values();
-		// if we found only one store with only one match for searched products
 		if (foundProducts.size() == 1 && foundProducts.iterator().next().size() == 1) {
 			return true;
 		}
@@ -164,25 +143,17 @@ public class DSLService {
 				offersWithOneProduct++;
 			}
 		}
-		// if we only one product in each store, than there is possibility to pick the best offer
-		// if there were multiple products found in one store for the searched value and others
-		// have only one product...there is indication that the client request could be more specific
-		// and so we are not able to pick the correct result
 		return offersWithOneProduct == foundProducts.size();
 	}
 
-	// pomocna metoda, co mi premapuje kluce tak, ze vytiahne prvy prvok z listu - mozne pouzit ked prejde kontrolou na moznost porovnania
 	private Map<StoreName, Product> getAsSingleProductMap(Map<StoreName, List<Product>> map) {
 		return map.entrySet()
 			.stream()
 			.collect(toMap(Map.Entry::getKey, e -> e.getValue().get(0)));
 	}
 
-	// metoda, co mi da obchod a produkt podla toho, kde sa nachadza
 	private Map<StoreName, Product> getBestStoreOffer(Map<StoreName, Product> foundProduct) {
-		// - tu je moznost bud najnizsia cena alebo najvacsia zlava
 		Map.Entry<StoreName, Product> bestOffer = Collections.min(foundProduct.entrySet(), Comparator.comparingDouble(e -> e.getValue().getPrice()));
-
 		Map<StoreName, Product> multiplePotentialbestOffers = foundProduct.entrySet()
 			.stream()
 			.filter(e -> e.getKey() != bestOffer.getKey())
@@ -190,12 +161,10 @@ public class DSLService {
 			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 		multiplePotentialbestOffers.put(bestOffer.getKey(), bestOffer.getValue());
-
 		return multiplePotentialbestOffers;
 	}
 
-	// this method always returns list with one element
-	private List<Map<String, Object>> toProductListWithStoreElement(Map<StoreName, Product> bestOffer) {
+	private List<Map<String, Object>> toSingleProductListWithStoreElement(Map<StoreName, Product> bestOffer) {
 		List<Map<String, Object>> productList = new ArrayList<>(1);
 
 		String bestOfferStoreValue = bestOffer.keySet()
@@ -210,5 +179,20 @@ public class DSLService {
 		return productList;
 	}
 
-}
+	private List<Map<String, Object>> toProductListWithStoreElement(Map<StoreName, List<Product>> productsByStore) {
+		List<Map<String, Object>> productMaps = new ArrayList<>();
+		for (Map.Entry<StoreName, List<Product>> product : productsByStore.entrySet()) {
+			String store = product.getKey().name();
+			productMaps.addAll(product.getValue()
+				.stream()
+				.map(Product::toMap)
+				.map(p -> {
+					p.put("store", store);
+					return p;
+				})
+				.collect(toList()));
+		}
+		return productMaps;
+	}
 
+}
