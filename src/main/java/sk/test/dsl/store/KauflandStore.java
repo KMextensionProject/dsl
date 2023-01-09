@@ -57,12 +57,19 @@ public class KauflandStore extends Store {
 		Document pageWithCategoryMenu = Jsoup.connect(categoryUrls.get(Category.OSTATNE)).get();
 		List<String> specialCategoryUrls = ((KauflandParser) productParser).extractSpecialCategoryURLs(pageWithCategoryMenu);
 		for (String menuUrl : specialCategoryUrls) {
-			Document additionalCategoryPage = Jsoup.connect("https://www.kaufland.sk" + menuUrl).get();
+			Document additionalCategoryPage = Jsoup.connect(appendHostIfMissing(menuUrl)).get();
 			List<Product> additionalCategoryProducts = productParser.parseHtmlProductsInfo(additionalCategoryPage, Category.OSTATNE);
 			products.addAll(additionalCategoryProducts);
 		}
 
 		this.discountProducts = Collections.unmodifiableList(new ArrayList<>(products));
+	}
+
+	private String appendHostIfMissing(String categoryUrl) {
+		if (!categoryUrl.startsWith("http")) {
+			return KauflandURLMapper.BASE_URL + categoryUrl;
+		}
+		return categoryUrl;
 	}
 
 	@PostConstruct
@@ -72,7 +79,7 @@ public class KauflandStore extends Store {
 			updateDiscountProductList();
 			System.out.println("kaufland product list initialized with " + this.discountProducts.size() + " products");
 		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
+			ex.printStackTrace();
 			System.exit(500);
 		}
 	}
