@@ -88,8 +88,9 @@ public class KauflandParser implements HTMLProductParser {
 	}
 
 	private String parseDiscountPercentage(String discountPercentage) {
-		// sometimes they use to put "1/2 CENA!" instead of number
-		if (discountPercentage.startsWith("1/2")) {
+		// FIX: sometimes they use to put "1/2 CENA!" instead of number
+		// and there may be clubcard discount value as secondary string
+		if (discountPercentage.contains("1/2")) {
 			return "-50%";
 		}
 
