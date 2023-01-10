@@ -28,6 +28,7 @@ import sk.test.dsl.store.LidlStore;
 import sk.test.dsl.store.Store;
 import sk.test.dsl.store.StoreName;
 import sk.test.dsl.store.TescoStore;
+import sk.test.dsl.utils.StringUtils;
 
 // TODO: thing through and exchange for Pair object where map functionality is not needed
 
@@ -42,6 +43,13 @@ public class DSLService {
 
 	@Autowired
 	private LidlStore lidl;
+
+	public List<String> getStoreNames() {
+		return Arrays.stream(StoreName.values())
+			.map(StoreName::name)
+			.map(StringUtils::leadingCharToUpperCase)
+			.collect(toList());
+	}
 
 	public List<StoreName> getAvailableStores() {
 		return Arrays.asList(StoreName.values());

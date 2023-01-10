@@ -1,6 +1,7 @@
 package sk.test.dsl.controllers;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,12 @@ public class DSLController {
 
 	@Autowired
 	private DSLService service;
+
+	@GetMapping(path = "/stores/", produces = APPLICATION_JSON)
+	@ResponseBody
+	public List<String> getStoreNames(){
+		return service.getStoreNames();
+	}
 
 	@GetMapping(path = "/{store}/product/categories/", produces = APPLICATION_JSON)
 	@ResponseBody
@@ -53,5 +60,7 @@ public class DSLController {
 	public List<Map<String, List<Map<String, Object>>>> resolveDSL(@RequestBody List<String> shoppingList) {
 		return service.resolveDSL(shoppingList);
 	}
+	
+	
 
 }
