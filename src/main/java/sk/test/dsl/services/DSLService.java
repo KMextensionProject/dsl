@@ -7,6 +7,7 @@ import static sk.test.dsl.utils.StringUtils.stripDiacritics;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +42,10 @@ public class DSLService {
 
 	@Autowired
 	private LidlStore lidl;
+
+	public List<StoreName> getAvailableStores() {
+		return Arrays.asList(StoreName.values());
+	}
 
 	public Set<Category> getAvailableProductCategories(StoreName storeName) {
 		return getCorrespondingStoreInstance(storeName)
@@ -105,8 +110,7 @@ public class DSLService {
 				Map<StoreName, Product> bestOffer = getBestStoreOffer(getAsSingleProductMap(foundProductByStore));
 				productForDSL.put(productName, toSingleProductListWithStoreElement(bestOffer));
 			} else {
-				List<Map<String, Object>> productMaps = toProductListWithStoreElement(foundProductByStore);
-				productForDSL.put(productName, productMaps);
+				productForDSL.put(productName, toProductListWithStoreElement(foundProductByStore));
 			}
 
 			dsl.add(productForDSL);
@@ -172,9 +176,7 @@ public class DSLService {
 			.map(StoreName::name)
 			.collect(Collectors.joining("/"));
 
-		Map<String, Object> productMap = bestOffer.entrySet().iterator().next().getValue().toMap();
-		productMap.put("best_offer_store", bestOfferStoreValue);
-		productList.add(productMap);
+		productList.add(asMapWithStoreElement(bestOffer.entrySet().iterator().next().getValue(), bestOfferStoreValue));
 
 		return productList;
 	}
@@ -185,14 +187,16 @@ public class DSLService {
 			String store = product.getKey().name();
 			productMaps.addAll(product.getValue()
 				.stream()
-				.map(Product::toMap)
-				.map(p -> {
-					p.put("store", store);
-					return p;
-				})
+				.map(e -> asMapWithStoreElement(e, store))
 				.collect(toList()));
 		}
 		return productMaps;
+	}
+
+	private Map<String, Object> asMapWithStoreElement(Product product, String storeName) {
+		Map<String, Object> productMap = product.toMap();
+		productMap.put("store", storeName);
+		return productMap;
 	}
 
 }
