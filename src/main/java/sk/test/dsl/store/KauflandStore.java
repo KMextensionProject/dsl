@@ -1,5 +1,6 @@
 package sk.test.dsl.store;
 
+import static java.time.DayOfWeek.THURSDAY;
 import static java.time.DayOfWeek.WEDNESDAY;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class KauflandStore extends Store {
 
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
-		return Arrays.asList(WEDNESDAY);
+		return Arrays.asList(WEDNESDAY, THURSDAY); // is Wednesday OK?
 	}
 
 	@Override

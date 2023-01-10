@@ -3,6 +3,7 @@ package sk.test.dsl.store;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class LidlStore extends Store {
 
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
-		return Collections.emptyList();
+		return Arrays.asList(DayOfWeek.MONDAY);
 	}
 
 	@Override

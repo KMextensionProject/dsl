@@ -33,8 +33,8 @@ public class TescoStore extends Store {
 
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
-		// we've noticed little changes every day since the discount products availability is timed
-		return Arrays.asList(DayOfWeek.values());
+		// every Wednesday but we've noticed little changes every day since the discount products availability is timed
+		return Arrays.asList(DayOfWeek.values()); 
 	}
 
 	@Override
