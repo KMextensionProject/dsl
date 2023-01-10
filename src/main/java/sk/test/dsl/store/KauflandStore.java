@@ -55,7 +55,7 @@ public class KauflandStore extends Store {
 		}
 
 		// GET by special categories
-		Document pageWithCategoryMenu = Jsoup.connect(categoryUrls.get(Category.OSTATNE)).get();
+		Document pageWithCategoryMenu = Jsoup.connect(categoryUrls.get(Category.OVOCIE_ZELENINA)).get();
 		List<String> specialCategoryUrls = ((KauflandParser) productParser).extractSpecialCategoryURLs(pageWithCategoryMenu);
 		for (String menuUrl : specialCategoryUrls) {
 			Document additionalCategoryPage = Jsoup.connect(appendHostIfMissing(menuUrl)).get();
