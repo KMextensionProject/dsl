@@ -20,6 +20,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -42,6 +43,7 @@ public class KauflandStore extends Store {
 		return Arrays.asList(WEDNESDAY, THURSDAY); // is Wednesday OK?
 	}
 
+	@Scheduled(cron = "0 0 8 * * WED-THU")
 	@Override
 	public void updateDiscountProductList() throws IOException {
 		Set<Product> products = new HashSet<>(250);

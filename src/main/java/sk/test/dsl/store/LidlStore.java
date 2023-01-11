@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -36,6 +37,7 @@ public class LidlStore extends Store {
 		return Arrays.asList(DayOfWeek.MONDAY);
 	}
 
+	@Scheduled(cron = "0 0 8 * * MON")
 	@Override
 	public void updateDiscountProductList() throws IOException {
 		List<Product> productList = new ArrayList<>(150);

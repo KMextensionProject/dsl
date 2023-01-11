@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import sk.test.dsl.product.Category;
@@ -34,9 +35,10 @@ public class TescoStore extends Store {
 	@Override
 	public List<DayOfWeek> getDiscountUpdatingDays() {
 		// every Wednesday but we've noticed little changes every day since the discount products availability is timed
-		return Arrays.asList(DayOfWeek.values()); 
+		return Arrays.asList(DayOfWeek.values());
 	}
 
+	@Scheduled(cron = "0 0 8 * * MON-SUN")
 	@Override
 	public void updateDiscountProductList() throws IOException {
 		List<Product> products = new ArrayList<>(400);
