@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
@@ -31,6 +32,8 @@ import sk.test.dsl.product.parser.KauflandURLMapper;
 @Component
 public class KauflandStore extends Store {
 
+	private static final Logger LOGGER = Logger.getLogger(KauflandStore.class.getName());
+
 	@Autowired
 	public KauflandStore(
 		@Qualifier("kauflandURLMapper") KauflandURLMapper mapper, 
@@ -46,12 +49,18 @@ public class KauflandStore extends Store {
 	@Scheduled(cron = "0 0 8 * * WED-THU")
 	@Override
 	public void updateDiscountProductList() throws IOException {
+		LOGGER.info("Updating Kaufland product list..");
+		long start = System.currentTimeMillis();
+
 		Set<Product> products = new HashSet<>(250);
 
 		// GET by standard categories 
 		EnumMap<Category, String> categoryUrls = urlMapper.getCategoryURLMap();
 		for (Map.Entry<Category, String> entry : categoryUrls.entrySet()) {
-			Document htmlPage = Jsoup.connect(entry.getValue()).get();
+			String categoryUrl = entry.getValue();
+			LOGGER.finer("Calling " + categoryUrl);
+
+			Document htmlPage = Jsoup.connect(categoryUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(htmlPage, entry.getKey());
 			products.addAll(categoryProducts);
 		}
@@ -60,12 +69,17 @@ public class KauflandStore extends Store {
 		Document pageWithCategoryMenu = Jsoup.connect(categoryUrls.get(Category.OVOCIE_ZELENINA)).get();
 		List<String> specialCategoryUrls = ((KauflandParser) productParser).extractSpecialCategoryURLs(pageWithCategoryMenu);
 		for (String menuUrl : specialCategoryUrls) {
-			Document additionalCategoryPage = Jsoup.connect(appendHostIfMissing(menuUrl)).get();
+			menuUrl = appendHostIfMissing(menuUrl);
+			LOGGER.finer("Calling " + menuUrl);
+
+			Document additionalCategoryPage = Jsoup.connect(menuUrl).get();
 			List<Product> additionalCategoryProducts = productParser.parseHtmlProductsInfo(additionalCategoryPage, Category.OSTATNE);
 			products.addAll(additionalCategoryProducts);
 		}
 
 		this.discountProducts = Collections.unmodifiableList(new ArrayList<>(products));
+		LOGGER.info("Kaufland product list has been successfully updated to " + products.size() 
+			+ " products in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	private String appendHostIfMissing(String categoryUrl) {
@@ -78,11 +92,9 @@ public class KauflandStore extends Store {
 	@PostConstruct
 	private void initializeStore() {
 		try {
-			System.out.println("initializing kaufland product list...");
 			updateDiscountProductList();
-			System.out.println("kaufland product list initialized with " + this.discountProducts.size() + " products");
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			LOGGER.severe(() -> "Error initializing Lidl product list, shuting down with: " + ex.getMessage());
 			System.exit(500);
 		}
 	}

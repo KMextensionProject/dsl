@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
@@ -25,6 +26,8 @@ import sk.test.dsl.product.parser.TescoURLMapper;
 @Component
 public class TescoStore extends Store {
 
+	private static final Logger LOGGER = Logger.getLogger(TescoStore.class.getName());
+
 	@Autowired
 	public TescoStore(
 		@Qualifier("tescoURLMapper") TescoURLMapper urlMapper, 
@@ -41,26 +44,33 @@ public class TescoStore extends Store {
 	@Scheduled(cron = "0 0 8 * * MON-SUN")
 	@Override
 	public void updateDiscountProductList() throws IOException {
+		LOGGER.info("Updating Tesco product list..");
+		long start = System.currentTimeMillis();
+
 		List<Product> products = new ArrayList<>(400);
 		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			String baseCategoryUrl = entry.getValue();
+			LOGGER.finer("Calling " + baseCategoryUrl + " to find available pages");
 			int pages = ((TescoParser) productParser).getNumberOfAvailablePages(Jsoup.connect(baseCategoryUrl).get());
-			Document pageWithAllProducts = Jsoup.connect(((TescoURLMapper) urlMapper).getPagedURLByCategory(category, pages)).get();
+			String pagedUrl = ((TescoURLMapper) urlMapper).getPagedURLByCategory(category, pages);
+			LOGGER.finer("Found " + pages + " pages, calling " + pagedUrl);
+			Document pageWithAllProducts = Jsoup.connect(pagedUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(pageWithAllProducts, category);
 			products.addAll(categoryProducts);
 		}
+
 		this.discountProducts = Collections.unmodifiableList(products);
+		LOGGER.info("Tesco product list has been successfully updated to " + products.size() 
+			+ " products in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	@PostConstruct
 	private void initializeStore() {
 		try {
-			System.out.println("initializing Tesco product list...");
 			updateDiscountProductList();
-			System.out.println("tesco product list has been initialized with " + this.discountProducts.size() + " products");
 		} catch (IOException ioe) {
-			System.out.println(ioe.getMessage());
+			LOGGER.severe(() -> "Error initializing Lidl product list, shuting down with: " + ioe.getMessage());
 			System.exit(500);
 		}
 	}

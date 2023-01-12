@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,6 +23,8 @@ import static sk.test.dsl.product.parser.LidlURLMapper.BASE_URL;
 
 @Component("lidlParser")
 public class LidlParser implements HTMLProductParser {
+
+	private static final Logger LOGGER = Logger.getLogger(LidlParser.class.getName());
 
 	@Override
 	public List<Product> parseHtmlProductsInfo(Document htmlPage, Category productsCategory) throws IOException {
@@ -48,6 +51,7 @@ public class LidlParser implements HTMLProductParser {
 	}
 
 	private Document fetchProductPageContent(String url) throws IOException {
+		LOGGER.finer("Calling " + url);
 		StringBuilder content = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream()))) {
 			String line;
@@ -87,13 +91,17 @@ public class LidlParser implements HTMLProductParser {
 	}
 
 	public List<String> extractDynamicCategoryUrls() throws IOException {
+		LOGGER.finer("Calling " + BASE_URL + " to extract category URLs");
 		Document mainPage = Jsoup.connect(BASE_URL).get();
 		String discountPageURL = mainPage.select(".n-header__main-navigation-link").get(1).attr("href");
 		discountPageURL += "&channel=store&tabCode=Current_Sales_Week";
+
+		// this is duplicate somewhere else
 		if (!discountPageURL.startsWith("http")) {
 			discountPageURL = BASE_URL + discountPageURL;
 		}
 
+		LOGGER.finer("Calling: " + discountPageURL);
 		return Jsoup.connect(discountPageURL).get()
 			.select(".ATheHeroStage__SliderTrack.m-ux-slider-track-distances-8").get(1)
 			.select(".ATheHeroStage__Offer > a")
