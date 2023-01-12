@@ -58,8 +58,6 @@ public class KauflandStore extends Store {
 		EnumMap<Category, String> categoryUrls = urlMapper.getCategoryURLMap();
 		for (Map.Entry<Category, String> entry : categoryUrls.entrySet()) {
 			String categoryUrl = entry.getValue();
-			LOGGER.finer("Calling " + categoryUrl);
-
 			Document htmlPage = Jsoup.connect(categoryUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(htmlPage, entry.getKey());
 			products.addAll(categoryProducts);
@@ -70,8 +68,6 @@ public class KauflandStore extends Store {
 		List<String> specialCategoryUrls = ((KauflandParser) productParser).extractSpecialCategoryURLs(pageWithCategoryMenu);
 		for (String menuUrl : specialCategoryUrls) {
 			menuUrl = appendHostIfMissing(menuUrl);
-			LOGGER.finer("Calling " + menuUrl);
-
 			Document additionalCategoryPage = Jsoup.connect(menuUrl).get();
 			List<Product> additionalCategoryProducts = productParser.parseHtmlProductsInfo(additionalCategoryPage, Category.OSTATNE);
 			products.addAll(additionalCategoryProducts);

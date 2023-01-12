@@ -40,8 +40,6 @@ public class LidlStore extends Store {
 		return Arrays.asList(DayOfWeek.MONDAY);
 	}
 
-	// use aspect for timing bean update methods?
-
 	@Scheduled(cron = "0 0 8 * * MON")
 	@Override
 	public void updateDiscountProductList() throws IOException {
@@ -55,7 +53,6 @@ public class LidlStore extends Store {
 		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			String categoryUrl = entry.getValue();
-			LOGGER.finer("Calling " + categoryUrl); // this is like debug
 			Document categoryPage = Jsoup.connect(categoryUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(categoryPage, category);
 			productList.addAll(categoryProducts);

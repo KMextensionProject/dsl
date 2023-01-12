@@ -51,10 +51,8 @@ public class TescoStore extends Store {
 		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
 			String baseCategoryUrl = entry.getValue();
-			LOGGER.finer("Calling " + baseCategoryUrl + " to find available pages");
 			int pages = ((TescoParser) productParser).getNumberOfAvailablePages(Jsoup.connect(baseCategoryUrl).get());
 			String pagedUrl = ((TescoURLMapper) urlMapper).getPagedURLByCategory(category, pages);
-			LOGGER.finer("Found " + pages + " pages, calling " + pagedUrl);
 			Document pageWithAllProducts = Jsoup.connect(pagedUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(pageWithAllProducts, category);
 			products.addAll(categoryProducts);
