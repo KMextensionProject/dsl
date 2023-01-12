@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +19,6 @@ import sk.test.dsl.product.CategoryURLMapper;
 public class LidlURLMapper implements CategoryURLMapper {
 
 	public static final String BASE_URL = "https://www.lidl.sk";
-
 	private final EnumMap<Category, String> categoryEndpointMap;
 
 	@Autowired
@@ -36,19 +33,13 @@ public class LidlURLMapper implements CategoryURLMapper {
 		return new EnumMap<>(categoryEndpointMap);
 	}
 
-	@PostConstruct
-	private void initializeDynamicCategoryEndpoints() {
-		try {
-			List<String> categoryUrls = parser.extractDynamicCategoryUrls();
-			for (String categoryUrl : categoryUrls) {
-				addCategoryURLEntry(categoryUrl);
-				if (categoryEndpointMap.size() == 4) {
-					break;
-				}
+	public void updateCategoryEndpoints() throws IOException {
+		List<String> categoryUrls = parser.extractDynamicCategoryUrls();
+		for (String categoryUrl : categoryUrls) {
+			addCategoryURLEntry(categoryUrl);
+			if (categoryEndpointMap.size() == 4) {
+				break;
 			}
-		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
-			System.exit(500);
 		}
 	}
 

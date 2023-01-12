@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
@@ -25,6 +26,8 @@ import sk.test.dsl.product.parser.LidlURLMapper;
 @Component
 public class LidlStore extends Store {
 
+	private static final Logger LOGGER = Logger.getLogger(LidlStore.class.getName());
+
 	@Autowired
 	public LidlStore(
 		@Qualifier("lidlURLMapper") LidlURLMapper mapper, 
@@ -37,27 +40,38 @@ public class LidlStore extends Store {
 		return Arrays.asList(DayOfWeek.MONDAY);
 	}
 
+	// use aspect for timing bean update methods?
+
 	@Scheduled(cron = "0 0 8 * * MON")
 	@Override
 	public void updateDiscountProductList() throws IOException {
+		// these category URLs must be updated because they are dynamically generated
+		((LidlURLMapper) urlMapper).updateCategoryEndpoints();
+
+		LOGGER.info("Updating Lidl product list..");
+		long start = System.currentTimeMillis();
+
 		List<Product> productList = new ArrayList<>(150);
 		for (Map.Entry<Category, String> entry : urlMapper.getCategoryURLMap().entrySet()) {
 			Category category = entry.getKey();
-			Document categoryPage = Jsoup.connect(entry.getValue()).get();
+			String categoryUrl = entry.getValue();
+			LOGGER.finer("Calling " + categoryUrl); // this is like debug
+			Document categoryPage = Jsoup.connect(categoryUrl).get();
 			List<Product> categoryProducts = productParser.parseHtmlProductsInfo(categoryPage, category);
 			productList.addAll(categoryProducts);
 		}
+
 		this.discountProducts = Collections.unmodifiableList(productList);
+		LOGGER.info("Lidl product list has been successfully updated to " + productList.size() 
+		+ " products in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	@PostConstruct
 	private void initializeStore() {
 		try {
-			System.out.println("initializing Lidl product list...");
 			updateDiscountProductList();
-			System.out.println("Lidl product list has been initialized with " + this.discountProducts.size() + " products");
 		} catch (IOException ioe) {
-			System.out.println(ioe.getMessage());
+			LOGGER.severe(() -> "Error initializing Lidl product list, shuting down with: " + ioe.getMessage());
 			System.exit(500);
 		}
 	}
