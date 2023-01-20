@@ -103,7 +103,7 @@ public class LidlParser implements HTMLProductParser {
 
 		LOGGER.finer("Calling: " + discountPageURL);
 		return Jsoup.connect(discountPageURL).get()
-			.select(".ATheHeroStage__SliderTrack.m-ux-slider-track-distances-8").get(1)
+			.select(".ATheHeroStage__SliderTrack.m-ux-slider-track-distances-8")
 			.select(".ATheHeroStage__Offer > a")
 			.eachAttr("href");
 	}
