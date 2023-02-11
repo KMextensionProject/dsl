@@ -43,14 +43,13 @@ public class KauflandParser implements HTMLProductParser {
 				// this section is parent to discount products only and not to those marked "iba"
 				.select(".a-pricetag.a-pricetag--discount");
 
-			// there may be a non-discount product -> "iba"
-			if (discountPartParent.isEmpty()) {
+			String discountPercentage = discountPartParent.select(".a-pricetag__discount").text();
+			// there may be a non-discount product -> "iba" || there might but having -> "lacne"
+			if (discountPartParent.isEmpty() || discountPercentage.contains("LACN")) {
 				continue;
 			}
 
-			String discountPercentage = discountPartParent.select(".a-pricetag__discount").text();
 			Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container ");
-
 			String price = discountPartChild.select(".a-pricetag__price").text();
 			String prevPrice = discountPartChild
 				.select(".a-pricetag__old-price")
