@@ -68,7 +68,7 @@ public class LidlStore extends Store {
 		try {
 			updateDiscountProductList();
 		} catch (IOException ioe) {
-			LOGGER.severe(() -> "Error initializing Lidl product list, shuting down with: " + ioe.getMessage());
+			LOGGER.severe(() -> "Error initializing Lidl product list, shuting down with: " + ioe);
 			System.exit(500);
 		}
 	}

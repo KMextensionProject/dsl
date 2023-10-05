@@ -29,7 +29,11 @@ public class TescoParser implements HTMLProductParser {
 			.select(".product__info-wrapper");
 
 		for (Element tile : tiles) {
-			String productName = tile.selectFirst(".product__name").text();
+			Element productNameElement = tile.selectFirst(".product__name");
+			if (productNameElement == null) {
+				continue;
+			}
+			String productName = productNameElement.text();
 			Element pricePartParent = tile.selectFirst(".product__secondary-text");
 			Elements pricePartChilds = pricePartParent.select(".product__price-cc-text");
 

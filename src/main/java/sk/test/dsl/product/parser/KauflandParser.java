@@ -49,7 +49,7 @@ public class KauflandParser implements HTMLProductParser {
 				continue;
 			}
 
-			Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container ");
+			// Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container");
 			String price = discountPartChild.select(".a-pricetag__price").text();
 			String prevPrice = discountPartChild
 				.select(".a-pricetag__old-price")
@@ -89,6 +89,7 @@ public class KauflandParser implements HTMLProductParser {
 	private String parseDiscountPercentage(String discountPercentage) {
 		// FIX: sometimes they use to put "1/2 CENA!" instead of number
 		// and there may be clubcard discount value as secondary string
+		System.out.println(discountPercentage);;
 		if (discountPercentage.contains("1/2")) {
 			return "-50%";
 		}

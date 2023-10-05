@@ -7,6 +7,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,5 +40,10 @@ public class WebAppInitializer implements WebMvcConfigurer {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
+	}
+	
+	@Override
+	public void addCorsMappings(CorsRegistry reg) {
+		reg.addMapping("/**");
 	}
 }
