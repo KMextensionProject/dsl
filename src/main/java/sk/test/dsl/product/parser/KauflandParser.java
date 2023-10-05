@@ -49,7 +49,7 @@ public class KauflandParser implements HTMLProductParser {
 				continue;
 			}
 
-			// Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container");
+			Elements discountPartChild = discountPartParent.select(".a-pricetag__price-container");
 			String price = discountPartChild.select(".a-pricetag__price").text();
 			String prevPrice = discountPartChild
 				.select(".a-pricetag__old-price")
